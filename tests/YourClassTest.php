@@ -21,7 +21,7 @@ class YourClassTest extends TestCase
      */
     public function testIsThereAnySyntaxError()
     {
-        $var = new Norgul\Xmpp\YourClass;
+        $var = new Norgul\Xmpp\XmppClient;
         $this->assertTrue(is_object($var));
         unset($var);
     }
@@ -35,7 +35,7 @@ class YourClassTest extends TestCase
      */
     public function testMethod1()
     {
-        $var = new Norgul\Xmpp\YourClass;
+        $var = new Norgul\Xmpp\XmppClient;
         $this->assertTrue($var->method1("hey") == 'Hello World');
         unset($var);
     }
