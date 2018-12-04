@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mdupor
- * Date: 04/12/2018
- * Time: 12:03
- */
 
 namespace Norgul\Xmpp\Authorization;
-
 
 interface AuthInterface
 {
@@ -19,4 +12,11 @@ interface AuthInterface
      * @return mixed
      */
     public static function encodedCredentials($username, $password);
+
+    /**
+     * Simple name getter
+     *
+     * @return string
+     */
+    public function getName(): string;
 }

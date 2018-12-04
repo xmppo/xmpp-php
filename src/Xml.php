@@ -22,7 +22,7 @@ XML;
 
 
     const AUTH = <<<AUTH
-<auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="%s">{%s}</auth>
+<auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="{mechanism}">{encoded}</auth>
 AUTH;
 
 

@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp;
 
+use Norgul\Xmpp\Authorization\Plain;
+
 /**
  * Class Socket
  * @package Norgul\Xmpp
@@ -67,10 +69,8 @@ class Socket
 
     public function authorize($username, $password)
     {
-        $authString = base64_encode("\x00" . $username . "\x00" . $password);
-
-        $this->send(XML::AUTH);
-
+        $preparedString = Auth::authorize(new Plain(), $username, $password);
+        $this->send($preparedString);
     }
 
     public function terminateConnection()
