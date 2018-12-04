@@ -19,12 +19,27 @@ XML;
      */
     const CLOSE_TAG = '</stream:stream>';
 
-
-
     const AUTH = <<<AUTH
 <auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="{mechanism}">{encoded}</auth>
 AUTH;
 
+    const MESSAGE = <<<MSG
+<message to="{to}" type="{messageType}">
+    <body>{body}</body>
+</message>
+MSG;
+
+    const RESOURCE = <<<RES
+<iq type="set">
+    <bind xmlns="urn:ietf:params:xml:ns:xmpp-bind">
+        <resource>{resource}</resource>
+    </bind>
+</iq>
+RES;
+
+    const ROSTER = <<<ROSTER
+<iq type="get"><query xmlns="jabber:iq:roster"/></iq>
+ROSTER;
 
     /**
      * Quote XML input.

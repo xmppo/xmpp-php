@@ -37,5 +37,15 @@ class XmppClient
         $this->socket->terminateConnection();
     }
 
+    public function getResponse()
+    {
+        $this->socket->getServerResponse();
+    }
+
+    public function sendMessage($message, $to, $type = 'CHAT')
+    {
+        $this->socket->sendMessage($message, $to, $type);
+    }
+
 
 }

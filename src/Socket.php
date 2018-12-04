@@ -33,12 +33,6 @@ class Socket
 
         $this->openStream();
         $this->authorize($connector->getUsername(), $connector->getPassword());
-
-        echo "*** Data ***\n\n";
-        while ($out = socket_read($this->socket, 2048)) {
-            echo str_replace("><", ">\n<",$out) . "\n\n";
-        }
-        echo "\n\n************\n";
     }
 
     /**
@@ -48,6 +42,17 @@ class Socket
     public function send($xml)
     {
         socket_write($this->socket, $xml, strlen($xml));
+    }
+
+    public function sendMessage($message, $to, $type)
+    {
+        $preparedString = Xml::quote(str_replace(
+            ['{message}', '{to}', '{type}'],
+            [$message, $to, $type],
+            Xml::MESSAGE
+        ));
+
+        $this->send($preparedString);
     }
 
     /**
@@ -78,6 +83,21 @@ class Socket
         socket_close($this->socket);
     }
 
+    /**
+     * Get response from server if any
+     */
+    public function getServerResponse()
+    {
+        // Wait max 3 seconds before terminating the socket
+        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => 5, "usec" => 0));
 
+        echo "*** Data ***\n\n";
+        while ($out = socket_read($this->socket, 2048)) {
+            echo str_replace("><", ">\n<",$out) . "\n\n";
+        }
+        echo "\n\n************\n";
 
+        // Reset waiting period to infinite
+        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => 0, "usec" => 0));
+    }
 }
