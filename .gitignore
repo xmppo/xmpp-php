@@ -1,0 +1,15 @@
+vendor/
+composer.lock
+.DS_Store
+/node_modules
+/vendor
+.idea
+.idea/
+/.idea
+/.idea/*
+/.vscode
+/nbproject
+/.vagrant
+npm-debug.log
+yarn-error.log
+.phpunit.result.cache

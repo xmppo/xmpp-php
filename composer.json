@@ -1,0 +1,24 @@
+{
+    "name": "norgul/xmpp-php",
+    "description": "PHP library for XMPP.",
+    "keywords": ["php", "xmpp", "library"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marko Dupor",
+            "email": "marko.dupor@gmail.com"
+        }
+    ],
+    "type": "project",
+    "require": {
+		"php": ">=7.1"
+    },
+    "require-dev": {
+		"phpunit/phpunit": "6.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Norgul\\Xmpp\\": "src/"
+        }
+    }
+}
