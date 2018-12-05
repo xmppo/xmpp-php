@@ -24,8 +24,8 @@ XML;
 AUTH;
 
     const MESSAGE = <<<MSG
-<message to="{to}" type="{messageType}">
-    <body>{body}</body>
+<message to="{to}" type="{type}">
+    <body>{message}</body>
 </message>
 MSG;
 
