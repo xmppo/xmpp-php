@@ -3,6 +3,10 @@
 **Disclaimer**: even though I called it a version, this is in no way production ready
 and current repository state is really volatile due to my testing and all-around changes.
 
+**Disclaimer 2**: I have found my initial inspiration with <https://github.com/fabiang/xmpp>. 
+Even though it is not my intention to copy anything, there will be parts of the code which
+may resemble. I have found this library incomplete and started mine from scratch. 
+
 This is low level socket implementation for enabling PHP to 
 communicate with XMPP due to lack of such libraries online (at least ones I 
 could find). 
@@ -20,29 +24,29 @@ point to your XMPP server and from project root run `php Example.php`.
 
 # Library usage
 ## Init
-In order to start using the library you first need to instantiate a new `Connector` 
+In order to start using the library you first need to instantiate a new `Options` 
 class. Everything except setting a port number is required. If omitted, port 
 will default to `5222` which is XMPP default. 
 
 ```
-$connector = new Connector();
+$options = new Options();
 
-$connector
+$options
     ->setHost($host)
     ->setPort($port)            // defaults to 5222
     ->setUsername($username)
     ->setPassword($password);
 ```
 
-Connector object is required for establishing the connection and every other subsequent
+Options object is required for establishing the connection and every other subsequent
 request, so once set it should not be changed. 
 
-Once this is set you can instantiate new client object and pass the connector object in.
+Once this is set you can instantiate new client object and pass the options object in.
 
 ## Connect & auth
 ```
 $client = new XmppClient();
-$client->connect($connector);
+$client->connect($options);
 ```
 
 `$client->connect()` method does a few things:

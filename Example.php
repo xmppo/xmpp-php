@@ -11,16 +11,16 @@ class Example
         $username = 'foo';
         $password = 'bar';
 
-        $connector = new Options();
+        $options = new Options();
 
-        $connector
+        $options
             ->setHost($host)
             ->setPort($port)
             ->setUsername($username)
             ->setPassword($password);
 
         $client = new XmppClient();
-        $client->connect($connector);
+        $client->connect($options);
 
         $client->setResource('/resource');
 

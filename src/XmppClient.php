@@ -34,11 +34,11 @@ class XmppClient
     /**
      * Open socket to host:port and authenticate with given credentials
      *
-     * @param Options $connector
+     * @param Options $options
      */
-    public function connect(Options $connector)
+    public function connect(Options $options)
     {
-        $result = socket_connect($this->socket, $connector->getHost(), $connector->getPort());
+        $result = socket_connect($this->socket, $options->getHost(), $options->getPort());
         echo $result ? "Socket connected\n" : "Socket connection failed. $result " . socket_strerror(socket_last_error($this->socket)) . "\n";
 
         /**
@@ -46,7 +46,7 @@ class XmppClient
          */
         $this->send(Xml::OPEN_TAG);
 
-        $this->authenticate($connector->getUsername(), $connector->getPassword());
+        $this->authenticate($options->getUsername(), $options->getPassword());
     }
 
     /**
