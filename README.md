@@ -38,10 +38,10 @@ $options
     ->setPassword($password);
 ```
 
-Options object is required for establishing the connection and every other subsequent
+`Options` object is required for establishing the connection and every other subsequent
 request, so once set it should not be changed. 
 
-Once this is set you can instantiate new client object and pass the options object in.
+Once this is set you can instantiate new `XmppClient` object and pass the `Options` object in.
 
 ## Connect & auth
 ```
@@ -68,6 +68,17 @@ yourself by passing it as a parameter.
 is the actual message you'd like to send, second one is recipient of the message and third
 one is type of message to be sent. This is currently set to default to `CHAT`, but will probably
 be extended in future releases
+
+## More options (not required)
+
+`Options` object can take more options which may be chained but are not required. These are explained
+and commented in the code directly in the `Options` class:
+
+```
+$options
+    ->setSocketWaitPeriod($wait) // Defaults to 1s
+```
+
 
 # Getting something back
 

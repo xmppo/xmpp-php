@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp;
 
+use PHPUnit\Runner\Exception;
+
 class Options
 {
     /**
@@ -20,15 +22,19 @@ class Options
      * Password to authenticate on XMPP server
      */
     protected $password;
+    /**
+     * Period in seconds during which the socket will be active when doing a socket_read()
+     */
+    protected $socketWaitPeriod = 1;
 
     public function getHost()
     {
         if(!$this->host)
-            echo "No host found, please set the host variable ";
+            throw new Exception("No host found, please set the host variable");
         return $this->host;
     }
 
-    public function setHost($host): Options
+    public function setHost(string $host): Options
     {
         $this->host = $host;
         return $this;
@@ -39,7 +45,7 @@ class Options
         return $this->port;
     }
 
-    public function setPort($port): Options
+    public function setPort(int $port): Options
     {
         $this->port = $port;
         return $this;
@@ -48,11 +54,11 @@ class Options
     public function getUsername()
     {
         if(!$this->username)
-            echo "No username found, please set the username variable ";
+            throw new Exception("No username found, please set the username variable");
         return $this->username;
     }
 
-    public function setUsername($username): Options
+    public function setUsername(string $username): Options
     {
         $this->username = $username;
         return $this;
@@ -60,16 +66,26 @@ class Options
 
     public function getPassword()
     {
-        if(!$this->host)
-            echo "No password found, please set the password variable ";
+        if(!$this->password)
+            throw new Exception("No password found, please set the password variable");
         return $this->password;
     }
 
-    public function setPassword($password): Options
+    public function setPassword(string $password): Options
     {
         $this->password = $password;
         return $this;
     }
 
+    public function getSocketWaitPeriod(): int
+    {
+        return $this->socketWaitPeriod;
+    }
+
+    public function setSocketWaitPeriod(int $socketWaitPeriod): Options
+    {
+        $this->$socketWaitPeriod = $socketWaitPeriod;
+        return $this;
+    }
 
 }

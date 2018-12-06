@@ -19,8 +19,8 @@ class Example
             ->setUsername($username)
             ->setPassword($password);
 
-        $client = new XmppClient();
-        $client->connect($options);
+        $client = new XmppClient($options);
+        $client->connect();
 
         $client->setResource('/resource');
 
@@ -28,20 +28,9 @@ class Example
 
         $client->getRawResponse();
 
-        $client->disconnect();
-
-
+//        // Uncomment if you want to manually enter raw XML and see a server response
 //        do {
-//            try {
-//                echo "*** Data ***\n\n";
-//                while ($out = socket_read($client->getSocket(), 2048)) {
-//                    echo str_replace("><", ">\n<",$out) . "\n\n";
-//                }
-//                echo "\n\n************\n";
-//            } catch (Exception $e) {
-//                echo "Error\n";
-//                echo $e;
-//            }
+//            $client->getRawResponse();
 //
 //            $line = readline("\nEnter XML: ");
 //
@@ -50,8 +39,9 @@ class Example
 //
 //        } while ($line != 'exit');
 
+        $client->disconnect();
     }
 }
 
 require __DIR__ . '/vendor/autoload.php';
-Example2::go();
+Example::go();

@@ -12,17 +12,17 @@ use Norgul\Xmpp\Authentication\AuthTypes\Plain;
  */
 class XmppClient
 {
-    /**
-     * Global socket instance
-     */
     protected $socket;
+    protected $options;
 
     /**
      * XmppClient constructor. Initializing a new socket
+     * @param Options $options
      */
-    public function __construct()
+    public function __construct(Options $options)
     {
         $this->socket = socket_create(AF_INET, SOCK_STREAM, 0);
+        $this->options = $options;
         echo __METHOD__ . " Socket created\n";
     }
 
@@ -33,12 +33,10 @@ class XmppClient
 
     /**
      * Open socket to host:port and authenticate with given credentials
-     *
-     * @param Options $options
      */
-    public function connect(Options $options)
+    public function connect()
     {
-        $result = socket_connect($this->socket, $options->getHost(), $options->getPort());
+        $result = socket_connect($this->socket, $this->options->getHost(), $this->options->getPort());
         echo $result ? "Socket connected\n" : "Socket connection failed. $result " . socket_strerror(socket_last_error($this->socket)) . "\n";
 
         /**
@@ -46,7 +44,7 @@ class XmppClient
          */
         $this->send(Xml::OPEN_TAG);
 
-        $this->authenticate($options->getUsername(), $options->getPassword());
+        $this->authenticate($this->options->getUsername(), $this->options->getPassword());
     }
 
     /**
@@ -100,7 +98,8 @@ class XmppClient
     public function getRawResponse()
     {
         // Wait max 3 seconds before terminating the socket
-        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => 1, "usec" => 0));
+        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO,
+            ["sec" => $this->options->getSocketWaitPeriod(), "usec" => 0]);
         try {
 
             while ($out = socket_read($this->socket, 2048)) {
