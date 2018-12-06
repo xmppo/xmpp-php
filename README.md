@@ -1,5 +1,10 @@
 # PHP library for XMPP
 
+[![Latest Stable Version](https://poser.pugx.org/norgul/xmpp-php/v/stable)](https://packagist.org/packages/norgul/xmpp-php)
+[![Total Downloads](https://poser.pugx.org/norgul/xmpp-php/downloads)](https://packagist.org/packages/norgul/xmpp-php)
+[![Latest Unstable Version](https://poser.pugx.org/norgul/xmpp-php/v/unstable)](https://packagist.org/packages/norgul/xmpp-php)
+[![License](https://poser.pugx.org/norgul/xmpp-php/license)](https://packagist.org/packages/norgul/xmpp-php)
+
 **Disclaimer**: even though I called it a version, this is in no way production ready
 and current repository state is really volatile due to my testing and all-around changes.
 
@@ -11,13 +16,16 @@ This is low level socket implementation for enabling PHP to
 communicate with XMPP due to lack of such libraries online (at least ones I 
 could find). 
 
+XMPP core documentation can be found [here](https://xmpp.org/rfcs/rfc6120.html).
+
 Current version is oriented towards simplicity and XMPP understanding under the
 hood. Should the need arise, I will expand the library, and by all means feel
 free to contribute to the repository. 
 
 # Installation requirements and example
 
-Project requirements are given in `composer.json` file:
+Project requirements are given in `composer.json` file (this assumes you know what 
+[Composer](https://getcomposer.org) is):
 
 ```
 "require": {
@@ -25,7 +33,11 @@ Project requirements are given in `composer.json` file:
 },
 ```
 
-After initial `composer install`, the library is ready to go.
+You can use this library in your project by running:
+
+```
+composer require norgul/xmpp-php
+```
 
 You can see usage example in `Example.php` file by changing credentials to 
 point to your XMPP server and from project root run `php Example.php`.
@@ -34,7 +46,10 @@ point to your XMPP server and from project root run `php Example.php`.
 ## Init
 In order to start using the library you first need to instantiate a new `Options` 
 class. Everything except setting a port number is required. If omitted, port 
-will default to `5222` which is XMPP default. 
+will default to `5222` which is XMPP default. Username can be either bare JID, in which
+case you will probably have to run `$client->setResource()` (see below), or it can be
+in form `JID/resource` in which case resource will be automatically parsed and sent to 
+server.
 
 ```
 $options = new Options();
@@ -66,9 +81,8 @@ Current version supports only `PLAIN` auth method.
 
 ## Setting resource
 
-`$client->setResource()` method sets the resource (duh!). This will be extended in future releases
-to support getting resource based on `JID/resource` parsing, but for now you can set it
-yourself by passing it as a parameter.
+`$client->setResource()` method sets the resource (duh!). If you have provided username in 
+`JID/resource` form, this will be set automatically for you.
 
 ## Sending messages
 

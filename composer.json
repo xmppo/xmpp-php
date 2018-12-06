@@ -1,7 +1,7 @@
 {
     "name": "norgul/xmpp-php",
     "description": "PHP library for XMPP.",
-    "keywords": ["php", "xmpp", "library"],
+    "keywords": ["php", "xmpp", "jabber", "library"],
     "license": "MIT",
     "authors": [
         {

@@ -23,6 +23,10 @@ class Options
      */
     protected $password;
     /**
+     * XMPP resource
+     */
+    protected $resource = '';
+    /**
      * Period in seconds during which the socket will be active when doing a socket_read()
      */
     protected $socketWaitPeriod = 1;
@@ -85,6 +89,17 @@ class Options
     public function setSocketWaitPeriod(int $socketWaitPeriod): Options
     {
         $this->$socketWaitPeriod = $socketWaitPeriod;
+        return $this;
+    }
+
+    public function getResource()
+    {
+        return $this->resource;
+    }
+
+    public function setResource($resource): Options
+    {
+        $this->resource = $resource;
         return $this;
     }
 

@@ -45,14 +45,20 @@ class XmppClient
          */
         $this->send(Xml::OPEN_TAG);
 
-        $this->authenticate($this->options->getUsername(), $this->options->getPassword());
+        /**
+         * Try to assign a resource if it exists. If bare JID is forwarded, this will default to your username
+         */
+        $username = $this->splitUsernameResource($this->options->getUsername());
+
+        $this->authenticate($username, $this->options->getPassword());
+        $this->setResource($this->options->getResource());
     }
 
     /**
      * Sending XML stanzas to open socket
      * @param $xml
      */
-    public function send($xml)
+    public function send(string $xml)
     {
         socket_write($this->socket, $xml, strlen($xml));
     }
@@ -65,7 +71,7 @@ class XmppClient
      * @param $to
      * @param $type
      */
-    public function sendMessage($message, $to, $type = "CHAT")
+    public function sendMessage(string $message, string $to, string $type = "CHAT")
     {
         $preparedString = str_replace(
             ['{message}', '{to}', '{type}'],
@@ -78,11 +84,13 @@ class XmppClient
 
     /**
      * Set resource
-     * TODO: this should be refactored to get resources either automatically or with JID/resource
      * @param $resource
      */
-    public function setResource($resource)
+    public function setResource(string $resource)
     {
+        if(empty($resource) || $resource == '')
+            return;
+
         $preparedString = str_replace('{resource}', Xml::quote($resource), Xml::RESOURCE);
         $this->send($preparedString);
     }
@@ -102,13 +110,11 @@ class XmppClient
         socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO,
             ["sec" => $this->options->getSocketWaitPeriod(), "usec" => 0]);
         try {
-
             while ($out = socket_read($this->socket, 2048)) {
                 echo "*** Data ***\n\n";
                 echo str_replace("><", ">\n<", $out) . "\n\n";
                 echo "\n\n************\n";
             }
-
         } catch (Exception $e) {
             echo "Error\n";
             echo $e;
@@ -125,8 +131,25 @@ class XmppClient
     {
         $this->send(Xml::CLOSE_TAG);
         socket_close($this->socket);
+        TerminalLog::info('Socket closed');
     }
 
+    /**
+     * Try to extract resource from JID. If not present, this will default to
+     *
+     * @param string $username
+     * @return string
+     */
+    protected function splitUsernameResource(string $username): string
+    {
+        $usernameResource = explode('/', $username);
+
+        if (count($usernameResource) > 1) {
+            $this->options->setResource($usernameResource[1]);
+            return $usernameResource[0];
+        }
+        return $username;
+    }
 
 
 }
