@@ -15,7 +15,15 @@ Current version is oriented towards simplicity and XMPP understanding under the
 hood. Should the need arise, I will expand the library, and by all means feel
 free to contribute to the repository. 
 
-# Install and example
+# Installation requirements and example
+
+Project requirements are given in `composer.json` file:
+
+```
+"require": {
+    "php": ">=7.0"
+},
+```
 
 After initial `composer install`, the library is ready to go.
 
@@ -32,10 +40,10 @@ will default to `5222` which is XMPP default.
 $options = new Options();
 
 $options
-    ->setHost($host)
-    ->setPort($port)            // defaults to 5222
-    ->setUsername($username)
-    ->setPassword($password);
+    ->setHost($host)            // required
+    ->setPort($port)            // not required, defaults to 5222
+    ->setUsername($username)    // required
+    ->setPassword($password);   // required
 ```
 
 `Options` object is required for establishing the connection and every other subsequent
@@ -76,7 +84,7 @@ and commented in the code directly in the `Options` class:
 
 ```
 $options
-    ->setSocketWaitPeriod($wait) // Defaults to 1s
+    ->setSocketWaitPeriod($wait) // defaults to 1s
 ```
 
 

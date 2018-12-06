@@ -5,6 +5,7 @@ namespace Norgul\Xmpp;
 use Exception;
 use Norgul\Xmpp\Authentication\Auth;
 use Norgul\Xmpp\Authentication\AuthTypes\Plain;
+use Norgul\Xmpp\Log\TerminalLog;
 
 /**
  * Class Socket
@@ -23,7 +24,7 @@ class XmppClient
     {
         $this->socket = socket_create(AF_INET, SOCK_STREAM, 0);
         $this->options = $options;
-        echo __METHOD__ . " Socket created\n";
+        TerminalLog::info('Socket created');
     }
 
     public function getSocket()
@@ -37,7 +38,7 @@ class XmppClient
     public function connect()
     {
         $result = socket_connect($this->socket, $this->options->getHost(), $this->options->getPort());
-        echo $result ? "Socket connected\n" : "Socket connection failed. $result " . socket_strerror(socket_last_error($this->socket)) . "\n";
+        $result ? TerminalLog::info("Socket connected") : TerminalLog::error("Socket connection failed. $result " . socket_strerror(socket_last_error($this->socket)));
 
         /**
          * Opening stream to XMPP server
@@ -125,4 +126,7 @@ class XmppClient
         $this->send(Xml::CLOSE_TAG);
         socket_close($this->socket);
     }
+
+
+
 }

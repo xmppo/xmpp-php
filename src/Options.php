@@ -2,7 +2,7 @@
 
 namespace Norgul\Xmpp;
 
-use PHPUnit\Runner\Exception;
+use Norgul\Xmpp\Log\TerminalLog;
 
 class Options
 {
@@ -30,7 +30,7 @@ class Options
     public function getHost()
     {
         if(!$this->host)
-            throw new Exception("No host found, please set the host variable");
+            TerminalLog::error("No host found, please set the host variable");
         return $this->host;
     }
 
@@ -54,7 +54,7 @@ class Options
     public function getUsername()
     {
         if(!$this->username)
-            throw new Exception("No username found, please set the username variable");
+            TerminalLog::error("No username found, please set the username variable");
         return $this->username;
     }
 
@@ -67,7 +67,7 @@ class Options
     public function getPassword()
     {
         if(!$this->password)
-            throw new Exception("No password found, please set the password variable");
+            TerminalLog::error("No password found, please set the password variable");
         return $this->password;
     }
 
