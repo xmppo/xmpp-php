@@ -2,7 +2,7 @@
 
 namespace Norgul\Xmpp;
 
-class Connector
+class Options
 {
     /**
      * Hostname of XMPP server
@@ -28,7 +28,7 @@ class Connector
         return $this->host;
     }
 
-    public function setHost($host): Connector
+    public function setHost($host): Options
     {
         $this->host = $host;
         return $this;
@@ -39,7 +39,7 @@ class Connector
         return $this->port;
     }
 
-    public function setPort($port): Connector
+    public function setPort($port): Options
     {
         $this->port = $port;
         return $this;
@@ -52,7 +52,7 @@ class Connector
         return $this->username;
     }
 
-    public function setUsername($username): Connector
+    public function setUsername($username): Options
     {
         $this->username = $username;
         return $this;
@@ -65,7 +65,7 @@ class Connector
         return $this->password;
     }
 
-    public function setPassword($password): Connector
+    public function setPassword($password): Options
     {
         $this->password = $password;
         return $this;

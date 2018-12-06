@@ -3,7 +3,8 @@
 namespace Norgul\Xmpp;
 
 use Exception;
-use Norgul\Xmpp\Authorization\Plain;
+use Norgul\Xmpp\Authentication\Auth;
+use Norgul\Xmpp\Authentication\AuthTypes\Plain;
 
 /**
  * Class Socket
@@ -31,11 +32,11 @@ class XmppClient
     }
 
     /**
-     * Open socket to host:port and authorize with given credentials
+     * Open socket to host:port and authenticate with given credentials
      *
-     * @param Connector $connector
+     * @param Options $connector
      */
-    public function connect(Connector $connector)
+    public function connect(Options $connector)
     {
         $result = socket_connect($this->socket, $connector->getHost(), $connector->getPort());
         echo $result ? "Socket connected\n" : "Socket connection failed. $result " . socket_strerror(socket_last_error($this->socket)) . "\n";
@@ -45,7 +46,7 @@ class XmppClient
          */
         $this->send(Xml::OPEN_TAG);
 
-        $this->authorize($connector->getUsername(), $connector->getPassword());
+        $this->authenticate($connector->getUsername(), $connector->getPassword());
     }
 
     /**
@@ -87,9 +88,9 @@ class XmppClient
         $this->send($preparedString);
     }
 
-    public function authorize($username, $password)
+    public function authenticate($username, $password)
     {
-        $preparedString = Auth::authorize(new Plain(), $username, $password);
+        $preparedString = Auth::authenticate(new Plain(), $username, $password);
         $this->send($preparedString);
     }
 

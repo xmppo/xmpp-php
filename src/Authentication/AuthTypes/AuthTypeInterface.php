@@ -1,8 +1,8 @@
 <?php
 
-namespace Norgul\Xmpp\Authorization;
+namespace Norgul\Xmpp\Authentication\AuthTypes;
 
-interface AuthInterface
+interface AuthTypeInterface
 {
     /**
      * Based on auth type, return the right format of credentials to be sent to the server

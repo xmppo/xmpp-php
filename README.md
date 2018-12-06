@@ -1,5 +1,8 @@
 # PHP library for XMPP
 
+**Disclaimer**: even though I called it a version, this is in no way production ready
+and current repository state is really volatile due to my testing and all-around changes.
+
 This is low level socket implementation for enabling PHP to 
 communicate with XMPP due to lack of such libraries online (at least ones I 
 could find). 
@@ -13,7 +16,7 @@ free to contribute to the repository.
 After initial `composer install`, the library is ready to go.
 
 You can see usage example in `Example.php` file by changing credentials to 
-point to your XMPP server and from project root run `php src/Example.php`.
+point to your XMPP server and from project root run `php Example.php`.
 
 # Library usage
 ## Init
@@ -26,7 +29,7 @@ $connector = new Connector();
 
 $connector
     ->setHost($host)
-    ->setPort($port)
+    ->setPort($port)            // defaults to 5222
     ->setUsername($username)
     ->setPassword($password);
 ```
@@ -45,7 +48,7 @@ $client->connect($connector);
 `$client->connect()` method does a few things:
 1. Connects to the socket which was initialized in `XmppClient` constructor
 2. Opens XML stream to exchange with XMPP server
-3. Tries to authorize with the server based on provided credentials
+3. Tries to authenticate with the server based on provided credentials
 
 Current version supports only `PLAIN` auth method. 
 

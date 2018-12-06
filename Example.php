@@ -11,7 +11,7 @@ class Example
         $username = 'foo';
         $password = 'bar';
 
-        $connector = new Connector();
+        $connector = new Options();
 
         $connector
             ->setHost($host)
@@ -53,5 +53,5 @@ class Example
     }
 }
 
-require __DIR__ . '/../vendor/autoload.php';
-Example::go();
+require __DIR__ . '/vendor/autoload.php';
+Example2::go();
