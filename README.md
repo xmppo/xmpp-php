@@ -62,7 +62,8 @@ is the actual message you'd like to send, second one is recipient of the message
 one is type of message to be sent. This is currently set to default to `CHAT`, but will probably
 be extended in future releases
 
-## Getting something back
+# Getting something back
 
 Mostly all methods look as if they do nothing unless you get some output back. For this you can 
-run a `$client->getServerResponse()` method which will fetch the XML from server back.
+run a `$client->getRawResponse()` method which will fetch the XML from server back. This
+is raw unfiltered data.

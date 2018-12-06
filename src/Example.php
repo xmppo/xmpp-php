@@ -26,7 +26,7 @@ class Example
 
         $client->sendMessage('Hello world', 'test@jabber.com');
 
-        $client->getServerResponse();
+        $client->getRawResponse();
 
         $client->disconnect();
 

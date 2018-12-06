@@ -96,17 +96,17 @@ class XmppClient
     /**
      * Get response from server if any
      */
-    public function getServerResponse()
+    public function getRawResponse()
     {
         // Wait max 3 seconds before terminating the socket
         socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, array("sec" => 1, "usec" => 0));
         try {
 
-            echo "*** Data ***\n\n";
             while ($out = socket_read($this->socket, 2048)) {
+                echo "*** Data ***\n\n";
                 echo str_replace("><", ">\n<", $out) . "\n\n";
+                echo "\n\n************\n";
             }
-            echo "\n\n************\n";
 
         } catch (Exception $e) {
             echo "Error\n";
