@@ -41,6 +41,12 @@ RES;
 <iq type="get"><query xmlns="jabber:iq:roster"/></iq>
 ROSTER;
 
+    //<presence from="{from}" to="{to}" type="{type}" />
+    const PRESENCE = <<<PRESENCE
+<presence to="{to}" type="{type}" />
+PRESENCE;
+
+
     /**
      * Quote XML input.
      *

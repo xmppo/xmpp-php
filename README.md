@@ -91,6 +91,10 @@ is the actual message you'd like to send, second one is recipient of the message
 one is type of message to be sent. This is currently set to default to `CHAT`, but will probably
 be extended in future releases
 
+## Roster
+
+`$client->getRoster()` takes no arguments and fetches current authenticated user roster. 
+
 ## More options (not required)
 
 `Options` object can take more options which may be chained but are not required. These are explained

@@ -95,6 +95,31 @@ class XmppClient
         $this->send($preparedString);
     }
 
+    /**
+     * Get roster for current authenticated user
+     */
+    public function getRoster()
+    {
+        $this->send(Xml::ROSTER);
+    }
+
+    /**
+     * Ask the user to accept a presence subscription event
+     *
+     * @param $to
+     * @param string $type
+     */
+    public function subscribe($to, $type = "subscribe")
+    {
+        $preparedString = str_replace(
+            ['{to}', '{type}'],
+            [Xml::quote($to), Xml::quote($type)],
+            Xml::PRESENCE
+        );
+
+        $this->send($preparedString);
+    }
+
     public function authenticate($username, $password)
     {
         $preparedString = Auth::authenticate(new Plain(), $username, $password);
