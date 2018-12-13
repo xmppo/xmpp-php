@@ -22,11 +22,18 @@ class Example
         $client = new XmppClient($options);
         $client->connect();
 
+        // can be omitted if username is of type JID/resource
         $client->setResource('/resource');
+
+        $client->getRoster();
 
         $client->sendMessage('Hello world', 'test@jabber.com');
 
         $client->getRawResponse();
+
+        do{
+            $client->getParsedResponse();
+        }while(true);
 
 //        // Uncomment if you want to manually enter raw XML and see a server response
 //        do {

@@ -8,10 +8,6 @@
 **Disclaimer**: even though I called it a version, this is in no way production ready
 and current repository state is really volatile due to my testing and all-around changes.
 
-**Disclaimer 2**: I have found my initial inspiration with <https://github.com/fabiang/xmpp>. 
-Even though it is not my intention to copy anything, there will be parts of the code which
-may resemble. I have found this library incomplete and started mine from scratch. 
-
 This is low level socket implementation for enabling PHP to 
 communicate with XMPP due to lack of such libraries online (at least ones I 
 could find). 
@@ -91,6 +87,20 @@ is the actual message you'd like to send, second one is recipient of the message
 one is type of message to be sent. This is currently set to default to `CHAT`, but will probably
 be extended in future releases
 
+## Receiving messages and other responses
+
+Mostly all methods look as if they do nothing unless you get some output back. For this you can 
+run one of two public methods:
+ 
+ 1. `$client->getRawResponse()` method will fetch the XML from server back. This
+is raw unfiltered data. These responses are suitable for any server return. 
+
+2. `$client->getParsedResponse()` method will try to parse the XML response. Even though
+it looks intuitive that every response can be parsed, this is not true for example for
+first response you will get from server opening the XML session with `<stream:stream>` tag. 
+This tag is closed only at the end of the session, thus making this initial XML invalid. 
+If response fails to parse, it will fall back to raw response.  
+
 ## Roster
 
 `$client->getRoster()` takes no arguments and fetches current authenticated user roster. 
@@ -104,10 +114,3 @@ and commented in the code directly in the `Options` class:
 $options
     ->setSocketWaitPeriod($wait) // defaults to 1s
 ```
-
-
-# Getting something back
-
-Mostly all methods look as if they do nothing unless you get some output back. For this you can 
-run a `$client->getRawResponse()` method which will fetch the XML from server back. This
-is raw unfiltered data.
