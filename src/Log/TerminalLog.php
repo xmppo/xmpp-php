@@ -24,14 +24,17 @@ class TerminalLog
 
     public static function response($message)
     {
-        echo "*** Data ***\n\n";
+        if(!$message || $message == '' || empty($message))
+            return;
 
-        if (get_resource_type($message) == 'xml') {
+        echo "\n****** DATA RECEIVED: " . date("Y/m/d h:i:sa") . " ******\n";
+
+        if (gettype($message) != 'string' && get_resource_type($message) == 'xml') {
             echo print_r($message, true);
         } else {
-            echo str_replace("><", ">\n<", $message) . "\n\n";
+            echo str_replace("><", ">\n<", $message);
         }
 
-        echo "\n\n************\n";
+        echo "\n****************************************************\n\n";
     }
 }
