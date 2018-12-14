@@ -21,4 +21,17 @@ class TerminalLog
     {
         throw new Exception($message);
     }
+
+    public static function response($message)
+    {
+        echo "*** Data ***\n\n";
+
+        if (get_resource_type($message) == 'xml') {
+            echo print_r($message, true);
+        } else {
+            echo str_replace("><", ">\n<", $message) . "\n\n";
+        }
+
+        echo "\n\n************\n";
+    }
 }

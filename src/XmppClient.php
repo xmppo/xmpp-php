@@ -23,11 +23,6 @@ class XmppClient
     public function __construct(Options $options)
     {
         $this->options = $options;
-
-//        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO,
-//            ["sec" => $this->options->getSocketWaitPeriod(), "usec" => 0]);
-
-
         TerminalLog::info('Socket created');
     }
 
@@ -41,14 +36,12 @@ class XmppClient
      */
     public function connect()
     {
-//        $result = socket_connect($this->socket, $this->options->getHost(), $this->options->getPort());
         $this->socket = stream_socket_client($this->options->getFullSocketAddress());
 
         // Wait max 3 seconds by default before terminating the socket. Can be changed with options
         stream_set_timeout($this->socket, $this->options->getSocketWaitPeriod());
 
-
-        // TODO: implement error handling and proper response
+        // TODO: implement proper error handling and response
         $this->socket ? TerminalLog::info("Socket connected") : TerminalLog::error("Socket connection failed");
 
         /**
@@ -74,10 +67,16 @@ class XmppClient
     /**
      * Sending XML stanzas to open socket
      * @param $xml
+     * @return bool
      */
     public function send(string $xml)
     {
-        fwrite($this->socket, $xml);
+        try {
+            fwrite($this->socket, $xml);
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -87,6 +86,7 @@ class XmppClient
      * @param $message
      * @param $to
      * @param $type
+     * @return bool
      */
     public function sendMessage(string $message, string $to, string $type = "CHAT")
     {
@@ -97,27 +97,32 @@ class XmppClient
         );
 
         $this->send($preparedString);
+        return true;
     }
 
     /**
      * Set resource
      * @param $resource
+     * @return bool
      */
     public function setResource(string $resource)
     {
         if (empty($resource) || $resource == '')
-            return;
+            return false;
 
         $preparedString = str_replace('{resource}', Xml::quote($resource), Xml::RESOURCE);
         $this->send($preparedString);
+        return true;
     }
 
     /**
-     * Get roster for current authenticated user
+     * Get roster for currently authenticated user
+     * @return bool
      */
     public function getRoster()
     {
         $this->send(Xml::ROSTER);
+        return true;
     }
 
     // TODO: not working? Not getting a server response
@@ -141,61 +146,60 @@ class XmppClient
         );
 
         $this->send($preparedString);
+        return true;
     }
 
     /**
      * Closed presence stanza, used in initial communication with server
+     * @return bool
      */
     private function presence()
     {
         $this->send('<presence/>');
+        return true;
     }
 
+    /**
+     * Authenticate user with given XMPP server
+     * @param $username
+     * @param $password
+     * @return bool
+     */
     public function authenticate($username, $password)
     {
         $preparedString = Auth::authenticate(new Plain(), $username, $password);
         $this->send($preparedString);
+        return true;
     }
 
     /**
-     * Get raw response from server if any
+     * Get response from server if any.
+     * If 'raw' flag is set to true the method will return the server response as-is
+     * If flag is set to false it will try to parse the response to XML object
+     *
+     * Since XMPP session is a continuous
+     * XML, first response from server can't be parsed as XML since it contains
+     * opening tag <stream:stream> without its closure.
+     * @param bool $raw
+     * @return string
      */
-    public function getRawResponse()
+    public function getResponse($raw = true): string
     {
+        $response = '';
         while ($out = fgets($this->socket)) {
-            echo "*** Data ***\n\n";
-            echo str_replace("><", ">\n<", $out) . "\n\n";
-            echo "\n\n************\n";
+            $response .= $out;
         }
-    }
 
-    // TODO: find alternative for XML parsing
-//    /**
-//     * Get parsed response from server if any. Since XMPP session is a continuous
-//     * XML, first response from server can't be parsed as XML since it contains
-//     * opening tag <stream:stream> without it being closed.
-//     */
-    public function getParsedResponse()
-    {
-        $this->getRawResponse();
-//        while ($out = socket_read($this->socket, 2048)) {
-//            echo "*** Data ***\n\n";
-//            $xml = simplexml_load_string($out);
-//
-//            if ($xml) {
-//                echo print_r($xml);
-//            } else {
-//                echo str_replace("><", ">\n<", $out) . "\n\n";
-//            }
-//
-//            echo "\n\n************\n";
-//        }
-//
-//        while ($out = fgets($this->socket)) {
-//            echo "*** Data ***\n\n";
-//            echo str_replace("><", ">\n<", $out) . "\n\n";
-//            echo "\n\n************\n";
-//        }
+        if (!$raw) {
+            try {
+                $response = simplexml_load_string($response);
+            } catch (Exception $e) {
+                //
+            }
+        }
+
+        TerminalLog::response($response);
+        return $response;
     }
 
     /**
@@ -204,7 +208,6 @@ class XmppClient
     public function disconnect()
     {
         $this->send(Xml::CLOSE_TAG);
-//        socket_close($this->socket);
         fclose($this->socket);
         TerminalLog::info('Socket closed');
     }

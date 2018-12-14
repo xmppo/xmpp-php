@@ -25,7 +25,6 @@ Project requirements are given in `composer.json` file (this assumes you know wh
 
 ```
 "require": {
-    "ext-sockets": "*",
     "php": ">=7.0"
 },
 ```
@@ -90,18 +89,16 @@ be extended in future releases
 
 ## Receiving messages and other responses
 
-Mostly all methods look as if they do nothing unless you get some output back. For this you can 
-run one of two public methods:
- 
- 1. `$client->getRawResponse()` method will fetch the XML from server back. This
-is raw unfiltered data. These responses are suitable for any server return. 
+Server responses (or server side continuous XML session to be exact) can be retrieved with 
+`$client->getRawResponse()` method which takes bool parameter (optional, set to `true` by default).
 
-2. `$client->getParsedResponse()` ~~method will try to parse the XML response. Even though
-it looks intuitive that every response can be parsed, this is not true for example for
+Parameter set to `true` will return raw response from server. Setting it to `false` will try 
+to parse the response to XML object. 
+
+Even though it looks intuitive that every response can be parsed, this is not true for example for
 first response you will get from server opening the XML session with `<stream:stream>` tag. 
 This tag is closed only at the end of the session, thus making this initial XML invalid. 
-If response fails to parse, it will fall back to raw response.~~ TODO: finding alternative,
-currently does the same as getting raw response.
+If response fails to parse, it will fall back to raw response. 
 
 ## Roster
 
