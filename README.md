@@ -25,6 +25,7 @@ Project requirements are given in `composer.json` file (this assumes you know wh
 
 ```
 "require": {
+    "ext-sockets": "*",
     "php": ">=7.0"
 },
 ```

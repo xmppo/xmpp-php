@@ -11,6 +11,7 @@
     ],
     "type": "project",
     "require": {
+        "ext-sockets": "*",
 		"php": ">=7.0"
     },
     "require-dev": {
