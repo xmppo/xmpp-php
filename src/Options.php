@@ -15,6 +15,10 @@ class Options
      */
     protected $port = 5222;
     /**
+     * Protocol used for socket connection, defaults to TCP
+     */
+    protected $protocol = 'tcp';
+    /**
      * Username to authenticate on XMPP server
      */
     protected $username;
@@ -101,6 +105,22 @@ class Options
     {
         $this->resource = $resource;
         return $this;
+    }
+    
+    public function getProtocol()
+    {
+        return $this->protocol;
+    }
+
+    public function setProtocol($protocol)
+    {
+        $this->protocol = $protocol;
+        return $this;
+    }
+
+    public function getFullSocketAddress()
+    {
+        return "$this->protocol://$this->host:$this->port";
     }
 
 }

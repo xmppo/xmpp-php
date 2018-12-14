@@ -96,11 +96,12 @@ run one of two public methods:
  1. `$client->getRawResponse()` method will fetch the XML from server back. This
 is raw unfiltered data. These responses are suitable for any server return. 
 
-2. `$client->getParsedResponse()` method will try to parse the XML response. Even though
+2. `$client->getParsedResponse()` ~~method will try to parse the XML response. Even though
 it looks intuitive that every response can be parsed, this is not true for example for
 first response you will get from server opening the XML session with `<stream:stream>` tag. 
 This tag is closed only at the end of the session, thus making this initial XML invalid. 
-If response fails to parse, it will fall back to raw response.  
+If response fails to parse, it will fall back to raw response.~~ TODO: finding alternative,
+currently does the same as getting raw response.
 
 ## Roster
 
@@ -113,5 +114,6 @@ and commented in the code directly in the `Options` class:
 
 ```
 $options
-    ->setSocketWaitPeriod($wait) // defaults to 1s
+    ->setSocketWaitPeriod($wait)    // defaults to 1s
+    ->setProtocol($protocol)        // defaults to TCP
 ```
