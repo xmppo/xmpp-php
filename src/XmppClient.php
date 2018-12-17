@@ -23,7 +23,6 @@ class XmppClient
     public function __construct(Options $options)
     {
         $this->options = $options;
-        TerminalLog::info('Socket created');
     }
 
     public function getSocket()
@@ -37,6 +36,7 @@ class XmppClient
     public function connect()
     {
         $this->socket = stream_socket_client($this->options->getFullSocketAddress());
+        TerminalLog::info('Socket created');
 
         // Wait max 3 seconds by default before terminating the socket. Can be changed with options
         stream_set_timeout($this->socket, $this->options->getSocketWaitPeriod());
@@ -136,6 +136,7 @@ class XmppClient
      * @param $from
      * @param $to
      * @param string $type
+     * @return bool
      */
     public function requestPresence($from, $to, $type = "subscribe")
     {
@@ -174,31 +175,33 @@ class XmppClient
 
     /**
      * Get response from server if any.
-     * If 'raw' flag is set to true the method will return the server response as-is
-     * If flag is set to false it will try to parse the response to XML object
-     *
-     * Since XMPP session is a continuous
-     * XML, first response from server can't be parsed as XML since it contains
-     * opening tag <stream:stream> without its closure.
-     * @param bool $raw
      * @return string
      */
-    public function getResponse($raw = true): string
+    public function getResponse(): string
     {
         $response = '';
         while ($out = fgets($this->socket)) {
             $response .= $out;
         }
 
-        if (!$raw) {
-            try {
-                $response = simplexml_load_string($response);
-            } catch (Exception $e) {
-                //
+        return $response;
+    }
+
+    /**
+     * Extracting messages from the response
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        $rawResponse = $this->getResponse();
+        $response = [];
+
+        if (preg_match_all("#(<message.*?>.*?<\/message>)#si", $rawResponse, $messages) && count($messages) > 1) {
+            foreach ($messages[1] as $message) {
+                $response[] = @simplexml_load_string($message);
             }
         }
 
-        TerminalLog::response($response);
         return $response;
     }
 

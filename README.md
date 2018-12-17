@@ -90,15 +90,19 @@ be extended in future releases
 ## Receiving messages and other responses
 
 Server responses (or server side continuous XML session to be exact) can be retrieved with 
-`$client->getRawResponse()` method which takes bool parameter (optional, set to `true` by default).
+`$client->getRawResponse()`.
 
-Parameter set to `true` will return raw response from server. Setting it to `false` will try 
-to parse the response to XML object. 
+In case you are not interested in complete response which comes from server, you may also use 
+`$client->getMessages()` which will match message tags with regex and return array of matched 
+messages. In case you'd like to see the response in the terminal, you can do something like this:
 
-Even though it looks intuitive that every response can be parsed, this is not true for example for
-first response you will get from server opening the XML session with `<stream:stream>` tag. 
-This tag is closed only at the end of the session, thus making this initial XML invalid. 
-If response fails to parse, it will fall back to raw response. 
+```
+do {
+    $response = $client->getMessages();
+    if($response)
+        echo print_r($response);
+} while (true);
+```
 
 ## Roster
 
