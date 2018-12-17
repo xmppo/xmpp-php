@@ -2,8 +2,6 @@
 
 namespace Norgul\Xmpp;
 
-use Norgul\Xmpp\Log\TerminalLog;
-
 class Options
 {
     /**
@@ -37,8 +35,8 @@ class Options
 
     public function getHost()
     {
-        if(!$this->host)
-            TerminalLog::error("No host found, please set the host variable");
+//        if(!$this->host)
+//            TerminalLog::error("No host found, please set the host variable");
         return $this->host;
     }
 
@@ -61,8 +59,8 @@ class Options
 
     public function getUsername()
     {
-        if(!$this->username)
-            TerminalLog::error("No username found, please set the username variable");
+//        if(!$this->username)
+//            TerminalLog::error("No username found, please set the username variable");
         return $this->username;
     }
 
@@ -74,8 +72,8 @@ class Options
 
     public function getPassword()
     {
-        if(!$this->password)
-            TerminalLog::error("No password found, please set the password variable");
+//        if(!$this->password)
+//            TerminalLog::error("No password found, please set the password variable");
         return $this->password;
     }
 
