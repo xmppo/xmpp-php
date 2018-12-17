@@ -193,12 +193,21 @@ class XmppClient
      */
     public function getMessages(): array
     {
+        return $this->getXmlTag("message");
+    }
+
+    /**
+     * @param string $tag
+     * @return array
+     */
+    public function getXmlTag(string $tag): array
+    {
         $rawResponse = $this->getResponse();
         $response = [];
 
-        if (preg_match_all("#(<message.*?>.*?<\/message>)#si", $rawResponse, $messages) && count($messages) > 1) {
-            foreach ($messages[1] as $message) {
-                $response[] = @simplexml_load_string($message);
+        if (preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched) && count($matched) > 1) {
+            foreach ($matched[1] as $match) {
+                $response[] = @simplexml_load_string($match);
             }
         }
 

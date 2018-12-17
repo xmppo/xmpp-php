@@ -39,7 +39,7 @@ class Example
         $client->getResponse();
 
         do {
-            $client->getResponse(false);
+            $client->getResponse();
         } while (true);
 
         // Uncomment if you want to manually enter raw XML and see a server response
