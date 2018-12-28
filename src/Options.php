@@ -33,7 +33,7 @@ class Options
     /**
      * XMPP resource
      */
-    protected $resource = '';
+    protected $resource;
     /**
      * Period in seconds during which the socket will be active when doing a socket_read()
      */

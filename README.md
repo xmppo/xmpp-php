@@ -90,7 +90,7 @@ be extended in future releases
 ## Receiving messages and other responses
 
 Server responses (or server side continuous XML session to be exact) can be retrieved with 
-`$client->getRawResponse()`.
+`$client->getResponse()`.
 
 In case you are not interested in complete response which comes from server, you may also use 
 `$client->getMessages()` which will match message tags with regex and return array of matched 
@@ -107,6 +107,13 @@ do {
 ## Roster
 
 `$client->getRoster()` takes no arguments and fetches current authenticated user roster. 
+
+## Priority
+
+`$client->setPriority()` sets priority for given resource. First argument is an integer 
+`-128 <> 127`. If no second argument is given, priority will be set for currently used resource.
+Other resource can be provided as a second argument whereas the priority will be set for that
+specific resource. 
 
 ## More options (not required)
 

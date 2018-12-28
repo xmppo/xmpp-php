@@ -153,6 +153,36 @@ class XmppClient
     }
 
     /**
+     * Set priority to current resource by default, or optional other resource tied to the
+     * current username
+     * @param int $priority
+     * @param null $resource
+     */
+    public function setPriority(int $priority, string $resource = null)
+    {
+        /**
+         * XMPP priority limitations
+         */
+        if ($priority > 127)
+            $priority = 127;
+        else if ($priority < -128)
+            $priority = -128;
+
+        if ($resource == null)
+            $from = Xml::quote($this->options->fullJid());
+        else
+            $from = $this->options->getUsername() . "/$resource";
+
+        $preparedString = str_replace(
+            ['{from}', '{priority}'],
+            [$from, $priority],
+            Xml::PRIORITY
+        );
+
+        $this->send($preparedString);
+    }
+
+    /**
      * Extracting messages from the response
      * @return array
      */

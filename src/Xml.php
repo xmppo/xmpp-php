@@ -46,6 +46,11 @@ ROSTER;
 <presence from="{from}" to="{to}" type="{type}" />
 PRESENCE;
 
+    const PRIORITY = <<<PRIORITY
+<presence from="{from}">
+    <priority>{priority}</priority>
+</presence>
+PRIORITY;
 
     /**
      * Quote XML input.
