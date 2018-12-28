@@ -4,7 +4,7 @@ namespace Norgul\Xmpp;
 
 use Exception;
 use Norgul\Xmpp\Authentication\Auth;
-use Norgul\Xmpp\Authentication\AuthTypes\Plain;
+use Norgul\Xmpp\Authentication\AuthTypes\AuthTypeInterface;
 
 /**
  * Class Socket
@@ -24,11 +24,6 @@ class XmppClient
         $this->options = $options;
     }
 
-    public function getSocket()
-    {
-        return $this->socket;
-    }
-
     /**
      * Open socket to host:port and authenticate with given credentials
      */
@@ -44,7 +39,7 @@ class XmppClient
          */
         $this->send(Xml::OPEN_TAG);
 
-        $this->authenticate($this->options->getUsername(), $this->options->getPassword());
+        $this->authenticate($this->options->getAuthType(), $this->options->getUsername(), $this->options->getPassword());
         $this->setResource($this->options->getResource());
 
         /**
@@ -92,7 +87,7 @@ class XmppClient
      * Set resource
      * @param $resource
      */
-    public function setResource(string $resource)
+    private function setResource(string $resource)
     {
         if (empty($resource) || trim($resource) == '')
             return;
@@ -133,12 +128,13 @@ class XmppClient
 
     /**
      * Authenticate user with given XMPP server
+     * @param AuthTypeInterface $authType
      * @param $username
      * @param $password
      */
-    public function authenticate($username, $password)
+    private function authenticate(AuthTypeInterface $authType, $username, $password)
     {
-        $preparedString = Auth::authenticate(new Plain(), $username, $password);
+        $preparedString = Auth::authenticate($authType, $username, $password);
         $this->send($preparedString);
     }
 

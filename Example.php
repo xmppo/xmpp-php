@@ -29,9 +29,6 @@ class Example
         $client = new XmppClient($options);
         $client->connect();
 
-        // optional
-        $client->setResource('/resource');
-
         $client->getRoster();
 
         $client->sendMessage('Hello world', 'test@jabber.com');

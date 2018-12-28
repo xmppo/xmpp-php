@@ -2,6 +2,12 @@
 
 namespace Norgul\Xmpp;
 
+use Norgul\Xmpp\Authentication\AuthTypes\AuthTypeInterface;
+use Norgul\Xmpp\Authentication\AuthTypes\Plain;
+use Psr\Log\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+
 class Options
 {
     /**
@@ -32,11 +38,29 @@ class Options
      * Period in seconds during which the socket will be active when doing a socket_read()
      */
     protected $socketWaitPeriod = 1;
+    /**
+     * PSR-3 logger interface
+     * @var $logger LoggerInterface
+     */
+    protected $logger;
+    /**
+     * Auth type
+     * @var $authType AuthTypeInterface
+     */
+    protected $authType;
+
+    public function __construct()
+    {
+        $this->logger = new NullLogger();
+    }
 
     public function getHost()
     {
-//        if(!$this->host)
-//            TerminalLog::error("No host found, please set the host variable");
+        if(!$this->host){
+            $this->logger->error("No host found, please set the host variable");
+            throw new InvalidArgumentException();
+        }
+
         return $this->host;
     }
 
@@ -59,8 +83,11 @@ class Options
 
     public function getUsername()
     {
-//        if(!$this->username)
-//            TerminalLog::error("No username found, please set the username variable");
+        if(!$this->username){
+            $this->logger->error("No username found, please set the username variable");
+            throw new InvalidArgumentException();
+        }
+
         return $this->username;
     }
 
@@ -84,8 +111,11 @@ class Options
 
     public function getPassword()
     {
-//        if(!$this->password)
-//            TerminalLog::error("No password found, please set the password variable");
+        if(!$this->password){
+            $this->logger->error("No password found, please set the password variable");
+            throw new InvalidArgumentException();
+        }
+
         return $this->password;
     }
 
@@ -114,7 +144,7 @@ class Options
         return $this->resource;
     }
 
-    public function setResource($resource): Options
+    public function setResource(string $resource): Options
     {
         $this->resource = trim($resource);
         return $this;
@@ -125,7 +155,7 @@ class Options
         return $this->protocol;
     }
 
-    public function setProtocol($protocol)
+    public function setProtocol(int $protocol)
     {
         $this->protocol = $protocol;
         return $this;
@@ -133,14 +163,43 @@ class Options
 
     public function fullSocketAddress()
     {
-        return "$this->protocol://$this->host:$this->port";
+        $protocol = $this->getProtocol();
+        $host = $this->getHost();
+        $port = $this->getPort();
+
+        return "$protocol://$host:$port";
     }
 
     public function fullJid()
     {
-        return "$this->username/$this->resource";
+        $username = $this->getUsername();
+        $resource = $this->getResource();
+
+        return "$username/$resource";
     }
 
+    public function getLogger()
+    {
+        return $this->logger;
+    }
 
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
 
+    public function setAuthType(AuthTypeInterface $authType)
+    {
+        $this->authType = $authType;
+        return $this;
+    }
+
+    public function getAuthType()
+    {
+        if(!$this->authType)
+            $this->authType = new Plain();
+
+        return $this->authType;
+    }
 }

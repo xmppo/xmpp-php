@@ -25,7 +25,8 @@ Project requirements are given in `composer.json` file (this assumes you know wh
 
 ```
 "require": {
-    "php": ">=7.0"
+    "php": ">=7.0",
+    "psr/log": "^1.0"
 },
 ```
 
@@ -117,4 +118,5 @@ $options
     ->setSocketWaitPeriod($wait)    // defaults to 1s
     ->setProtocol($protocol)        // defaults to TCP
     ->setResource($resource)        // defaults to 'norgul_machine' string + timestamp
+    ->setAuthType(AuthTypeInterface $authType)  // defaults to Plain
 ```
