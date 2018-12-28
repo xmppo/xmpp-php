@@ -42,7 +42,7 @@ class Options
 
     public function setHost(string $host): Options
     {
-        $this->host = $host;
+        $this->host = trim($host);
         return $this;
     }
 
@@ -64,9 +64,21 @@ class Options
         return $this->username;
     }
 
+    /**
+     * Try to assign a resource if it exists. If bare JID is forwarded, this will default to your username
+     *
+     * @param string $username
+     * @return Options
+     */
     public function setUsername(string $username): Options
     {
-        $this->username = $username;
+        $usernameResource = explode('/', $username);
+
+        if (count($usernameResource) > 1) {
+            $this->setResource(trim($usernameResource[1]));
+        }
+
+        $this->username = trim($username);
         return $this;
     }
 
@@ -96,12 +108,15 @@ class Options
 
     public function getResource()
     {
+        if(!$this->resource)
+            $this->resource = 'norgul_machine_' . time();
+
         return $this->resource;
     }
 
     public function setResource($resource): Options
     {
-        $this->resource = $resource;
+        $this->resource = trim($resource);
         return $this;
     }
     
@@ -116,9 +131,16 @@ class Options
         return $this;
     }
 
-    public function getFullSocketAddress()
+    public function fullSocketAddress()
     {
         return "$this->protocol://$this->host:$this->port";
     }
+
+    public function fullJid()
+    {
+        return "$this->username/$this->resource";
+    }
+
+
 
 }

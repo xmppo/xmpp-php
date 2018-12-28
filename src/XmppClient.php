@@ -34,7 +34,7 @@ class XmppClient
      */
     public function connect()
     {
-        $this->socket = stream_socket_client($this->options->getFullSocketAddress());
+        $this->socket = stream_socket_client($this->options->fullSocketAddress());
 
         // Wait max 3 seconds by default before terminating the socket. Can be changed with options
         stream_set_timeout($this->socket, $this->options->getSocketWaitPeriod());
@@ -44,19 +44,14 @@ class XmppClient
          */
         $this->send(Xml::OPEN_TAG);
 
-        /**
-         * Try to assign a resource if it exists. If bare JID is forwarded, this will default to your username
-         */
-        $username = $this->splitUsernameResource($this->options->getUsername());
-
-        $this->authenticate($username, $this->options->getPassword());
+        $this->authenticate($this->options->getUsername(), $this->options->getPassword());
         $this->setResource($this->options->getResource());
 
         /**
          * Initial presence stanza sent to server to check roster and send
          * presence notification to each person subscribed to you
          */
-        $this->presence();
+        $this->send('<presence/>');
     }
 
     /**
@@ -81,7 +76,6 @@ class XmppClient
      * @param $message
      * @param $to
      * @param $type
-     * @return bool
      */
     public function sendMessage(string $message, string $to, string $type = "CHAT")
     {
@@ -92,32 +86,27 @@ class XmppClient
         );
 
         $this->send($preparedString);
-        return true;
     }
 
     /**
      * Set resource
      * @param $resource
-     * @return bool
      */
     public function setResource(string $resource)
     {
-        if (empty($resource) || $resource == '')
-            return false;
+        if (empty($resource) || trim($resource) == '')
+            return;
 
         $preparedString = str_replace('{resource}', Xml::quote($resource), Xml::RESOURCE);
         $this->send($preparedString);
-        return true;
     }
 
     /**
      * Get roster for currently authenticated user
-     * @return bool
      */
     public function getRoster()
     {
         $this->send(Xml::ROSTER);
-        return true;
     }
 
     // TODO: not working? Not getting a server response
@@ -128,44 +117,29 @@ class XmppClient
      * - subscribed is user accepted
      * - unsubscribed if user declined
      *
-     * @param $from
      * @param $to
      * @param string $type
-     * @return bool
      */
-    public function requestPresence($from, $to, $type = "subscribe")
+    public function requestPresence($to, $type = "subscribe")
     {
         $preparedString = str_replace(
             ['{from}', '{to}', '{type}'],
-            [Xml::quote($from), Xml::quote($to), Xml::quote($type)],
+            [Xml::quote($this->options->fullJid()), Xml::quote($to), Xml::quote($type)],
             Xml::PRESENCE
         );
 
         $this->send($preparedString);
-        return true;
-    }
-
-    /**
-     * Closed presence stanza, used in initial communication with server
-     * @return bool
-     */
-    private function presence()
-    {
-        $this->send('<presence/>');
-        return true;
     }
 
     /**
      * Authenticate user with given XMPP server
      * @param $username
      * @param $password
-     * @return bool
      */
     public function authenticate($username, $password)
     {
         $preparedString = Auth::authenticate(new Plain(), $username, $password);
         $this->send($preparedString);
-        return true;
     }
 
     /**
@@ -188,25 +162,7 @@ class XmppClient
      */
     public function getMessages(): array
     {
-        return $this->getXmlTag("message");
-    }
-
-    /**
-     * @param string $tag
-     * @return array
-     */
-    public function getXmlTag(string $tag): array
-    {
-        $rawResponse = $this->getResponse();
-        $response = [];
-
-        if (preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched) && count($matched) > 1) {
-            foreach ($matched[1] as $match) {
-                $response[] = @simplexml_load_string($match);
-            }
-        }
-
-        return $response;
+        return Xml::parseTag($this->getResponse(), "message");
     }
 
     /**
@@ -217,23 +173,4 @@ class XmppClient
         $this->send(Xml::CLOSE_TAG);
         fclose($this->socket);
     }
-
-    /**
-     * Try to extract resource from JID. If not present, this will default to
-     *
-     * @param string $username
-     * @return string
-     */
-    protected function splitUsernameResource(string $username): string
-    {
-        $usernameResource = explode('/', $username);
-
-        if (count($usernameResource) > 1) {
-            $this->options->setResource($usernameResource[1]);
-            return $usernameResource[0];
-        }
-        return $username;
-    }
-
-
 }

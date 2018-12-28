@@ -29,7 +29,7 @@ class Example
         $client = new XmppClient($options);
         $client->connect();
 
-        // can be omitted if username is of type JID/resource
+        // optional
         $client->setResource('/resource');
 
         $client->getRoster();

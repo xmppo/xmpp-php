@@ -42,10 +42,14 @@ point to your XMPP server and from project root run `php Example.php`.
 ## Init
 In order to start using the library you first need to instantiate a new `Options` 
 class. Everything except setting a port number is required. If omitted, port 
-will default to `5222` which is XMPP default. Username can be either bare JID, in which
-case you will probably have to run `$client->setResource()` (see below), or it can be
-in form `JID/resource` in which case resource will be automatically parsed and sent to 
-server.
+will default to `5222` which is XMPP default. 
+
+Username can be either bare `JID` or in `JID/resource` form. If you are using a bare `JID`
+the resource will be added automatically. You can override this by explicitly setting a 
+resource with `$client->setResource()`. In the second case the username will be automatically
+parsed to `username` and `resource` variables. In case of `JID/resource/xyz` format, everything
+after second slash will be ignored. If both `JID/resource` is present as well as using the
+`$client->setResource()` method, second one will take precedence. 
 
 ```
 $options = new Options();
@@ -74,11 +78,6 @@ $client->connect($options);
 3. Tries to authenticate with the server based on provided credentials
 
 Current version supports only `PLAIN` auth method. 
-
-## Setting resource
-
-`$client->setResource()` method sets the resource (duh!). If you have provided username in 
-`JID/resource` form, this will be set automatically for you.
 
 ## Sending messages
 
@@ -117,4 +116,5 @@ and commented in the code directly in the `Options` class:
 $options
     ->setSocketWaitPeriod($wait)    // defaults to 1s
     ->setProtocol($protocol)        // defaults to TCP
+    ->setResource($resource)        // defaults to 'norgul_machine' string + timestamp
 ```

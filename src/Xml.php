@@ -41,6 +41,7 @@ RES;
 <iq type="get"><query xmlns="jabber:iq:roster"/></iq>
 ROSTER;
 
+    // With priority <presence from=".../..."><priority>10</priority></presence>
     const PRESENCE = <<<PRESENCE
 <presence from="{from}" to="{to}" type="{type}" />
 PRESENCE;
@@ -57,5 +58,21 @@ PRESENCE;
         return htmlspecialchars($input, ENT_XML1, 'utf-8');
     }
 
+    /**
+     * @param $rawResponse
+     * @param string $tag
+     * @return array
+     */
+    public static function parseTag($rawResponse, string $tag): array
+    {
+        $response = [];
 
+        if (preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched) && count($matched) > 1) {
+            foreach ($matched[1] as $match) {
+                $response[] = @simplexml_load_string($match);
+            }
+        }
+
+        return $response;
+    }
 }
