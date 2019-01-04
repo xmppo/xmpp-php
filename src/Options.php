@@ -56,7 +56,7 @@ class Options
 
     public function getHost()
     {
-        if(!$this->host){
+        if (!$this->host) {
             $this->logger->error("No host found, please set the host variable");
             throw new InvalidArgumentException();
         }
@@ -83,7 +83,7 @@ class Options
 
     public function getUsername()
     {
-        if(!$this->username){
+        if (!$this->username) {
             $this->logger->error("No username found, please set the username variable");
             throw new InvalidArgumentException();
         }
@@ -102,16 +102,18 @@ class Options
         $usernameResource = explode('/', $username);
 
         if (count($usernameResource) > 1) {
-            $this->setResource(trim($usernameResource[1]));
+            $this->setResource($usernameResource[1]);
+            $this->username = trim($usernameResource[0]);
+        } else {
+            $this->username = trim($username);
         }
 
-        $this->username = trim($username);
         return $this;
     }
 
     public function getPassword()
     {
-        if(!$this->password){
+        if (!$this->password) {
             $this->logger->error("No password found, please set the password variable");
             throw new InvalidArgumentException();
         }
@@ -138,7 +140,7 @@ class Options
 
     public function getResource()
     {
-        if(!$this->resource)
+        if (!$this->resource)
             $this->resource = 'norgul_machine_' . time();
 
         return $this->resource;
@@ -149,7 +151,7 @@ class Options
         $this->resource = trim($resource);
         return $this;
     }
-    
+
     public function getProtocol()
     {
         return $this->protocol;
@@ -197,7 +199,7 @@ class Options
 
     public function getAuthType()
     {
-        if(!$this->authType)
+        if (!$this->authType)
             $this->authType = new Plain();
 
         return $this->authType;
