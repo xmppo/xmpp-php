@@ -1,6 +1,6 @@
 <?php
 
-namespace Norgul\Xmpp;
+namespace Norgul\Xmpp\Xml;
 
 class Xml
 {
@@ -18,39 +18,6 @@ XML;
      * Closing tag for one XMPP stream session
      */
     const CLOSE_TAG = '</stream:stream>';
-
-    const AUTH = <<<AUTH
-<auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="{mechanism}">{encoded}</auth>
-AUTH;
-
-    const MESSAGE = <<<MSG
-<message to="{to}" type="{type}">
-    <body>{message}</body>
-</message>
-MSG;
-
-    const RESOURCE = <<<RES
-<iq type="set">
-    <bind xmlns="urn:ietf:params:xml:ns:xmpp-bind">
-        <resource>{resource}</resource>
-    </bind>
-</iq>
-RES;
-
-    const ROSTER = <<<ROSTER
-<iq type="get"><query xmlns="jabber:iq:roster"/></iq>
-ROSTER;
-
-    // With priority <presence from=".../..."><priority>10</priority></presence>
-    const PRESENCE = <<<PRESENCE
-<presence from="{from}" to="{to}" type="{type}" />
-PRESENCE;
-
-    const PRIORITY = <<<PRIORITY
-<presence from="{from}">
-    <priority>{priority}</priority>
-</presence>
-PRIORITY;
 
     /**
      * Quote XML input.
@@ -79,5 +46,13 @@ PRIORITY;
         }
 
         return $response;
+    }
+
+    private static function xml2array($xmlObject, $out = array())
+    {
+        foreach ((array)$xmlObject as $index => $node)
+            $out[$index] = (is_object($node)) ? self::xml2array($node) : $node;
+
+        return $out;
     }
 }

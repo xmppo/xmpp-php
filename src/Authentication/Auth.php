@@ -19,6 +19,7 @@ class Auth
     public static function authenticate(AuthTypeInterface $authType, $username, $password)
     {
         $encodedCredentials = $authType::encodedCredentials($username, $password);
-        return str_replace(['{mechanism}' ,'{encoded}'], [$authType->getName(), $encodedCredentials], XML::AUTH);
+
+        return (new Xml\Auth())->authenticate($encodedCredentials, $authType->getName());
     }
 }

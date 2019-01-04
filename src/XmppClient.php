@@ -5,6 +5,10 @@ namespace Norgul\Xmpp;
 use Exception;
 use Norgul\Xmpp\Authentication\Auth;
 use Norgul\Xmpp\Authentication\AuthTypes\AuthTypeInterface;
+use Norgul\Xmpp\Xml\Stanzas\Iq;
+use Norgul\Xmpp\Xml\Stanzas\Message;
+use Norgul\Xmpp\Xml\Stanzas\Presence;
+use Norgul\Xmpp\Xml\Xml;
 
 /**
  * Class Socket
@@ -15,6 +19,10 @@ class XmppClient
     protected $socket;
     protected $options;
 
+    private $iq;
+    private $presence;
+    private $message;
+
     /**
      * XmppClient constructor. Initializing a new socket
      * @param Options $options
@@ -22,6 +30,9 @@ class XmppClient
     public function __construct(Options $options)
     {
         $this->options = $options;
+        $this->iq = new Iq();
+        $this->presence = new Presence();
+        $this->message = new Message();
     }
 
     /**
@@ -74,13 +85,7 @@ class XmppClient
      */
     public function sendMessage(string $message, string $to, string $type = "CHAT")
     {
-        $preparedString = str_replace(
-            ['{message}', '{to}', '{type}'],
-            [Xml::quote($message), Xml::quote($to), Xml::quote($type)],
-            Xml::MESSAGE
-        );
-
-        $this->send($preparedString);
+        $this->send($this->message->sendMessage(Xml::quote($message), Xml::quote($to), $type));
     }
 
     /**
@@ -92,8 +97,7 @@ class XmppClient
         if (empty($resource) || trim($resource) == '')
             return;
 
-        $preparedString = str_replace('{resource}', Xml::quote($resource), Xml::RESOURCE);
-        $this->send($preparedString);
+        $this->send($this->iq->setResource(Xml::quote($resource)));
     }
 
     /**
@@ -101,7 +105,7 @@ class XmppClient
      */
     public function getRoster()
     {
-        $this->send(Xml::ROSTER);
+        $this->send($this->iq->getRoster());
     }
 
     // TODO: not working? Not getting a server response
@@ -117,13 +121,7 @@ class XmppClient
      */
     public function requestPresence($to, $type = "subscribe")
     {
-        $preparedString = str_replace(
-            ['{from}', '{to}', '{type}'],
-            [Xml::quote($this->options->fullJid()), Xml::quote($to), Xml::quote($type)],
-            Xml::PRESENCE
-        );
-
-        $this->send($preparedString);
+        $this->send($this->presence->requestPresence(Xml::quote($this->options->fullJid()), Xml::quote($to), Xml::quote($type)));
     }
 
     /**
@@ -156,30 +154,16 @@ class XmppClient
      * Set priority to current resource by default, or optional other resource tied to the
      * current username
      * @param int $priority
-     * @param null $resource
+     * @param string|null $resource
      */
     public function setPriority(int $priority, string $resource = null)
     {
-        /**
-         * XMPP priority limitations
-         */
-        if ($priority > 127)
-            $priority = 127;
-        else if ($priority < -128)
-            $priority = -128;
-
         if ($resource == null)
             $from = Xml::quote($this->options->fullJid());
         else
             $from = $this->options->getUsername() . "/$resource";
 
-        $preparedString = str_replace(
-            ['{from}', '{priority}'],
-            [$from, $priority],
-            Xml::PRIORITY
-        );
-
-        $this->send($preparedString);
+        $this->send($this->presence->setPriority($priority, $from));
     }
 
     /**

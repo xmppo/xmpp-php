@@ -2,7 +2,7 @@
 
 namespace Norgul\Xmpp\Authentication\AuthTypes;
 
-use Norgul\Xmpp\Xml;
+use Norgul\Xmpp\Xml\Xml;
 
 class Plain implements AuthTypeInterface
 {
