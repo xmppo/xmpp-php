@@ -121,7 +121,7 @@ class XmppClient
      */
     public function requestPresence($to, $type = "subscribe")
     {
-        $this->send($this->presence->requestPresence(Xml::quote($this->options->fullJid()), Xml::quote($to), Xml::quote($type)));
+        $this->send($this->presence->requestPresence(Xml::quote($this->options->bareJid()), Xml::quote($to), Xml::quote($type)));
     }
 
     /**
@@ -138,14 +138,18 @@ class XmppClient
 
     /**
      * Get response from server if any.
+     * @param bool $echoOutput
      * @return string
      */
-    public function getResponse(): string
+    public function getResponse($echoOutput = false): string
     {
         $response = '';
         while ($out = fgets($this->socket)) {
             $response .= $out;
         }
+
+        if ($echoOutput && $response)
+            echo "\n-------------\n $response \n-------------\n";
 
         return $response;
     }

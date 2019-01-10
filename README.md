@@ -104,6 +104,11 @@ do {
 } while (true);
 ```
 
+`$client->getResponse()` actually takes an optional boolean parameter `echoOutput` which is a 
+flag indicating whether the response should be echoed out. This is useful for testing from
+terminal so when you set the flag to `true` you will be able to actually see the response
+which will be returned. For all other purposes this flag should be set to `false`.
+
 ## Roster
 
 `$client->getRoster()` takes no arguments and fetches current authenticated user roster. 

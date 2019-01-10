@@ -17,7 +17,7 @@ abstract class AbstractXml
         $this->instance->formatOutput = true;
     }
 
-    public static function xml_to_array(\DOMDocument $root)
+    public static function xml_to_array(DOMDocument $root)
     {
         $result = array();
 

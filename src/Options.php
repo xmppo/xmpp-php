@@ -176,8 +176,17 @@ class Options
     {
         $username = $this->getUsername();
         $resource = $this->getResource();
+        $host = $this->getHost();
 
-        return "$username/$resource";
+        return "$username@$host/$resource";
+    }
+
+    public function bareJid()
+    {
+        $username = $this->getUsername();
+        $host = $this->getHost();
+
+        return "$username@$host";
     }
 
     public function getLogger()

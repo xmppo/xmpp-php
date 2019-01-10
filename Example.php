@@ -39,7 +39,7 @@ class Example
             $client->getResponse();
         } while (true);
 
-        // Uncomment if you want to manually enter raw XML and see a server response
+        // Uncomment if you want to manually enter raw XML (or call a function) and see a server response
 //        (new self)->sendRawXML($client);
 
         $client->disconnect();
@@ -48,12 +48,27 @@ class Example
     public function sendRawXML(XmppClient $client)
     {
         do {
-            $client->getResponse();
+            $client->getResponse(true);
 
+            // if you provide a function name here, (i.e. getRoster ...arg) the function will be called instead of sending raw XML
             $line = readline("\nEnter XML: ");
 
-            if ($line && $line != 'exit')
-                $client->send($line);
+            if ($line && $line != 'exit') {
+                $parsedLine = explode(' ', $line);
+
+                if (method_exists($client, $parsedLine[0])) {
+                    if (count($parsedLine) < 2) {
+                        $client->{$parsedLine[0]}();
+                    } else {
+                        $client->{$parsedLine[0]}($parsedLine[1]);
+                    }
+                } else {
+                    if (@simplexml_load_string($line)) {
+                        $client->send($line);
+                    } else
+                        echo "This is not a method nor a valid XML";
+                }
+            }
 
         } while ($line != 'exit');
     }
