@@ -131,6 +131,11 @@ class XmppClient
         $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'unsubscribed'));
     }
 
+    public function setGroup(string $name, string $forJid)
+    {
+        $this->send($this->iq->setGroup(Xml::quote($name), Xml::quote($forJid)));
+    }
+
     /**
      * Authenticate user with given XMPP server
      * @param AuthTypeInterface $authType

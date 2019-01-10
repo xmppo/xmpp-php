@@ -120,6 +120,20 @@ which will be returned. For all other purposes this flag should be set to `false
 Other resource can be provided as a second argument whereas the priority will be set for that
 specific resource. 
 
+## Presence
+
+`$client->requestPresence()` takes JID as an argument and asks that user for presence.
+
+`$client->acceptPresence()` takes JID as an argument and accepts presence from that user.
+
+`$client->declinePresence()` takes JID as an argument and declines presence from that user.
+
+## Group
+
+`$client->setGroup()` puts a given user in group you provide. Method takes two arguments: 
+first one being the group name which you will attach to given user, and other 
+being JID of that user. 
+
 ## More options (not required)
 
 `Options` object can take more options which may be chained but are not required. These are explained

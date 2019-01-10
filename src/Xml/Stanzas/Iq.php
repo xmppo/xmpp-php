@@ -10,8 +10,7 @@ class Iq extends AbstractXml
 
     public function getRoster(): string
     {
-        $root = $this->instance->createElement($this->xmlRootName);
-        $root->setAttribute('type', 'get');
+        $root = $this->setRoot('get');
 
         $queryNode = $this->instance->createElement('query');
         $queryNode->setAttribute('xmlns', 'jabber:iq:roster');
@@ -23,8 +22,7 @@ class Iq extends AbstractXml
 
     public function setResource(string $name): string
     {
-        $root = $this->instance->createElement($this->xmlRootName);
-        $root->setAttribute('type', 'set');
+        $root = $this->setRoot('set');
 
         $bindNode = $this->instance->createElement('bind');
         $bindNode->setAttribute('xmlns', 'urn:ietf:params:xml:ns:xmpp-bind');
@@ -37,10 +35,9 @@ class Iq extends AbstractXml
         return $this->instance->saveXML($root);
     }
 
-    public function setGroup(string $name, string $for)
+    public function setGroup(string $name, string $forJid)
     {
-        $root = $this->instance->createElement($this->xmlRootName);
-        $root->setAttribute('type', 'set');
+        $root = $this->setRoot('set');
 
         $queryNode = $this->instance->createElement('query');
         $queryNode->setAttribute('xmlns', 'jabber:iq:roster');
@@ -48,7 +45,7 @@ class Iq extends AbstractXml
         $root->appendChild($queryNode);
 
         $itemNode = $this->instance->createElement('item');
-        $itemNode->setAttribute('jid', $for);
+        $itemNode->setAttribute('jid', $forJid);
 
         $queryNode->appendChild($itemNode);
 
@@ -57,6 +54,13 @@ class Iq extends AbstractXml
         $itemNode->appendChild($groupNode);
 
         return $this->instance->saveXML($root);
+    }
+
+    private function setRoot(string $type)
+    {
+        $root = $this->instance->createElement($this->xmlRootName);
+        $root->setAttribute('type', $type);
+        return $root;
     }
 
 }
