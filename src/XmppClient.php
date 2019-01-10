@@ -79,13 +79,13 @@ class XmppClient
      * Send message to Jabber user
      * TODO: refactor to use object for type instead of string
      *
-     * @param $message
-     * @param $to
-     * @param $type
+     * @param string $body
+     * @param string $to
+     * @param string $type
      */
-    public function sendMessage(string $message, string $to, string $type = "CHAT")
+    public function sendMessage(string $body, string $to, string $type = "CHAT")
     {
-        $this->send($this->message->sendMessage(Xml::quote($message), Xml::quote($to), $type));
+        $this->send($this->message->sendMessage(Xml::quote($body), Xml::quote($to), $type));
     }
 
     /**
@@ -108,20 +108,27 @@ class XmppClient
         $this->send($this->iq->getRoster());
     }
 
-    // TODO: not working? Not getting a server response
-
     /**
      * Ask the user to accept a presence subscription event
      * Response should be:
      * - subscribed is user accepted
      * - unsubscribed if user declined
      *
-     * @param $to
-     * @param string $type
+     * @param $from
      */
-    public function requestPresence($to, $type = "subscribe")
+    public function requestPresence(string $from)
     {
-        $this->send($this->presence->requestPresence(Xml::quote($this->options->bareJid()), Xml::quote($to), Xml::quote($type)));
+        $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'subscribe'));
+    }
+
+    public function acceptPresence(string $from)
+    {
+        $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'subscribed'));
+    }
+
+    public function declinePresence(string $from)
+    {
+        $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'unsubscribed'));
     }
 
     /**

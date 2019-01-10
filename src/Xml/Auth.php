@@ -8,12 +8,12 @@ class Auth extends AbstractXml
 {
     protected $xmlRootName = 'auth';
 
-    public function authenticate(string $credentials, string $mechanism): string
+    public function authenticate(string $credentials, string $authType): string
     {
         $root = $this->instance->createElement($this->xmlRootName);
 
         $root->setAttribute('xmlns', 'urn:ietf:params:xml:ns:xmpp-sasl');
-        $root->setAttribute('mechanism', $mechanism);
+        $root->setAttribute('mechanism', $authType);
 
         $credentialsNode = $this->instance->createTextNode($credentials);
 

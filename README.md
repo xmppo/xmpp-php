@@ -145,7 +145,7 @@ Enter XML: getRoster                <-- will run getRoster() method
 Enter XML: requestPresence x@x.com  <-- will run with argument requestPresence(x@x.com)
 ```
 
-Some valid XMPP XML will be declined (like sending `</presence>`) because `simplexml_load_string()` 
+Some valid XMPP XML will be declined (like sending `<presence/>`) because `simplexml_load_string()` 
 is not able to parse it as being a valid XML. In cases you need to do some custom stuff like 
 that and you are sure it is a XMPP valid XML, you can remove the parsing line and just let the
 `send()` method do its magic.

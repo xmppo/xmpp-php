@@ -8,7 +8,12 @@ class Plain implements AuthTypeInterface
 {
     private $name = 'PLAIN';
 
-    public static function encodedCredentials($username, $password)
+    /**
+     * @param string $username
+     * @param string $password
+     * @return string
+     */
+    public static function encodedCredentials(string $username, string $password): string
     {
         return XML::quote(base64_encode("\x00$username\x00$password"));
     }

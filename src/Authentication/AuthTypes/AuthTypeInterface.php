@@ -11,7 +11,7 @@ interface AuthTypeInterface
      * @param $password
      * @return mixed
      */
-    public static function encodedCredentials($username, $password);
+    public static function encodedCredentials(string $username, string $password): string;
 
     /**
      * Simple name getter

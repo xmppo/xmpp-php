@@ -8,32 +8,33 @@ class Presence extends AbstractXml
 {
     protected $xmlRootName = 'presence';
 
-    public function requestPresence(string $from, string $to, string $type = "subscribe"): string
+    public function setPresence(string $from, string $to, string $type = "subscribe"): string
     {
         $root = $this->instance->createElement($this->xmlRootName);
         $root->setAttribute("from", $from);
         $root->setAttribute("to", $to);
         $root->setAttribute("type", $type);
 
+        echo $this->instance->saveXML($root);
         return $this->instance->saveXML($root);
     }
 
-    public function setPriority(int $priority, string $from = null): string
+    public function setPriority(int $value, string $forResource = null): string
     {
         $root = $this->instance->createElement($this->xmlRootName);
 
         /**
          * XMPP priority limitations
          */
-        if ($priority > 127)
-            $priority = 127;
-        else if ($priority < -128)
-            $priority = -128;
+        if ($value > 127)
+            $value = 127;
+        else if ($value < -128)
+            $value = -128;
 
-        if ($from)
-            $root->setAttribute("from", $from);
+        if ($forResource)
+            $root->setAttribute("from", $forResource);
 
-        $priorityNode = $this->instance->createElement('priority', $priority);
+        $priorityNode = $this->instance->createElement('priority', $value);
 
         $root->appendChild($priorityNode);
 
