@@ -1,4 +1,4 @@
-# PHP library for XMPP
+# PHP client library for XMPP (Jabber) protocol
 
 [![Latest Stable Version](https://poser.pugx.org/norgul/xmpp-php/v/stable)](https://packagist.org/packages/norgul/xmpp-php)
 [![Total Downloads](https://poser.pugx.org/norgul/xmpp-php/downloads)](https://packagist.org/packages/norgul/xmpp-php)
@@ -132,3 +132,24 @@ $options
     ->setResource($resource)        // defaults to 'norgul_machine' string + timestamp
     ->setAuthType(AuthTypeInterface $authType)  // defaults to Plain
 ```
+
+# Other
+
+`Example.php` has a `sendRawXML()` method which can be helpful with debugging. Method works in a way
+that you can provide hand-written XML and send it to the server. On the other hand you can 
+also trigger a method by providing method name instead of XML. 
+
+```
+Enter XML: <xml>foo</xml>           <-- will send XML
+Enter XML: getRoster                <-- will run getRoster() method
+Enter XML: requestPresence x@x.com  <-- will run with argument requestPresence(x@x.com)
+```
+
+Some valid XMPP XML will be declined (like sending `</presence>`) because `simplexml_load_string()` 
+is not able to parse it as being a valid XML. In cases you need to do some custom stuff like 
+that and you are sure it is a XMPP valid XML, you can remove the parsing line and just let the
+`send()` method do its magic.
+ 
+ **Be aware! Be very aware!** sending an invalid XML to the server
+will probably invalidate currently open XML session and you will probably need to restart the 
+script. 
