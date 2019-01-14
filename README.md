@@ -84,7 +84,7 @@ Current version supports only `PLAIN` auth method.
 
 `$client->sendMessage()` takes 3 parameters of which the last one is optional. First parameter
 is the actual message you'd like to send, second one is recipient of the message and third
-one is type of message to be sent. This is currently set to default to `CHAT`, but will probably
+one is type of message to be sent. This is currently set to default to `chat`, but will probably
 be extended in future releases
 
 ## Receiving messages and other responses

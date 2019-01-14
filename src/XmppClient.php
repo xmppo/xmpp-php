@@ -83,7 +83,7 @@ class XmppClient
      * @param string $to
      * @param string $type
      */
-    public function sendMessage(string $body, string $to, string $type = "CHAT")
+    public function sendMessage(string $body, string $to, string $type = "chat")
     {
         $this->send($this->message->sendMessage(Xml::quote($body), Xml::quote($to), $type));
     }
