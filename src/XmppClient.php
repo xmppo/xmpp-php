@@ -2,9 +2,7 @@
 
 namespace Norgul\Xmpp;
 
-use Exception;
 use Norgul\Xmpp\Authentication\Auth;
-use Norgul\Xmpp\Authentication\AuthTypes\AuthTypeInterface;
 use Norgul\Xmpp\Xml\Stanzas\Iq;
 use Norgul\Xmpp\Xml\Stanzas\Message;
 use Norgul\Xmpp\Xml\Stanzas\Presence;
@@ -16,136 +14,45 @@ use Norgul\Xmpp\Xml\Xml;
  */
 class XmppClient
 {
+    use Xml;
+    /**
+     * @var Socket $socket
+     */
     protected $socket;
     protected $options;
 
-    private $iq;
-    private $presence;
-    private $message;
+    protected $auth;
 
-    /**
-     * XmppClient constructor. Initializing a new socket
-     * @param Options $options
-     */
+    public $iq;
+    public $presence;
+    public $message;
+
     public function __construct(Options $options)
     {
         $this->options = $options;
-        $this->iq = new Iq();
-        $this->presence = new Presence();
-        $this->message = new Message();
+        $this->socket = new Socket($options->fullSocketAddress());
+        $this->iq = new Iq($this->socket, $options);
+        $this->presence = new Presence($this->socket, $options);
+        $this->message = new Message($this->socket, $options);
     }
 
-    /**
-     * Open socket to host:port and authenticate with given credentials
-     */
     public function connect()
     {
-        $this->socket = stream_socket_client($this->options->fullSocketAddress());
-
-        // Wait max 3 seconds by default before terminating the socket. Can be changed with options
-        stream_set_timeout($this->socket, $this->options->getSocketWaitPeriod());
-
-        /**
-         * Opening stream to XMPP server
-         */
-        $this->send(Xml::OPEN_TAG);
-
-        $this->authenticate($this->options->getAuthType(), $this->options->getUsername(), $this->options->getPassword());
-        $this->setResource($this->options->getResource());
-
-        /**
-         * Initial presence stanza sent to server to check roster and send
-         * presence notification to each person subscribed to you
-         */
-        $this->send('<presence/>');
+        $this->openStream();
+        $this->authenticate();
+        $this->iq->setResource($this->options->getResource());
+        $this->sendInitialPresenceStanza();
     }
 
-    /**
-     * Sending XML stanzas to open socket
-     * @param $xml
-     * @return bool
-     */
+    public function disconnect()
+    {
+        $this->send(self::closeXmlStream());
+        fclose($this->socket->connection);
+    }
+
     public function send(string $xml)
     {
-        try {
-            fwrite($this->socket, $xml);
-        } catch (Exception $e) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Send message to Jabber user
-     * TODO: refactor to use object for type instead of string
-     *
-     * @param string $body
-     * @param string $to
-     * @param string $type
-     */
-    public function sendMessage(string $body, string $to, string $type = "chat")
-    {
-        $this->send($this->message->sendMessage(Xml::quote($body), Xml::quote($to), $type));
-    }
-
-    /**
-     * Set resource
-     * @param $resource
-     */
-    private function setResource(string $resource)
-    {
-        if (empty($resource) || trim($resource) == '')
-            return;
-
-        $this->send($this->iq->setResource(Xml::quote($resource)));
-    }
-
-    /**
-     * Get roster for currently authenticated user
-     */
-    public function getRoster()
-    {
-        $this->send($this->iq->getRoster());
-    }
-
-    /**
-     * Ask the user to accept a presence subscription event
-     * Response should be:
-     * - subscribed is user accepted
-     * - unsubscribed if user declined
-     *
-     * @param $from
-     */
-    public function requestPresence(string $from)
-    {
-        $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'subscribe'));
-    }
-
-    public function acceptPresence(string $from)
-    {
-        $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'subscribed'));
-    }
-
-    public function declinePresence(string $from)
-    {
-        $this->send($this->presence->setPresence(Xml::quote($this->options->bareJid()), Xml::quote($from), 'unsubscribed'));
-    }
-
-    public function setGroup(string $name, string $forJid)
-    {
-        $this->send($this->iq->setGroup(Xml::quote($name), Xml::quote($forJid)));
-    }
-
-    /**
-     * Authenticate user with given XMPP server
-     * @param AuthTypeInterface $authType
-     * @param $username
-     * @param $password
-     */
-    private function authenticate(AuthTypeInterface $authType, $username, $password)
-    {
-        $preparedString = Auth::authenticate($authType, $username, $password);
-        $this->send($preparedString);
+        $this->socket->send($xml);
     }
 
     /**
@@ -156,30 +63,16 @@ class XmppClient
     public function getResponse($echoOutput = false): string
     {
         $response = '';
-        while ($out = fgets($this->socket)) {
+        while ($out = fgets($this->socket->connection)) {
             $response .= $out;
         }
 
-        if ($echoOutput && $response)
-            echo "\n-------------\n $response \n-------------\n";
+        if ($echoOutput && $response) {
+            $separator = "\n-------------\n";
+            echo "{$separator} $response {$separator}";
+        }
 
         return $response;
-    }
-
-    /**
-     * Set priority to current resource by default, or optional other resource tied to the
-     * current username
-     * @param int $priority
-     * @param string|null $resource
-     */
-    public function setPriority(int $priority, string $resource = null)
-    {
-        if ($resource == null)
-            $from = Xml::quote($this->options->fullJid());
-        else
-            $from = $this->options->getUsername() . "/$resource";
-
-        $this->send($this->presence->setPriority($priority, $from));
     }
 
     /**
@@ -188,15 +81,22 @@ class XmppClient
      */
     public function getMessages(): array
     {
-        return Xml::parseTag($this->getResponse(), "message");
+        return self::parseTag($this->getResponse(), "message");
     }
 
-    /**
-     * End the XMPP session and close the socket
-     */
-    public function disconnect()
+    protected function authenticate()
     {
-        $this->send(Xml::CLOSE_TAG);
-        fclose($this->socket);
+        $this->auth = new Auth($this->options);
+        $this->send($this->auth->authenticate());
+    }
+
+    protected function openStream()
+    {
+        $this->send(self::openXmlStream($this->options->getHost()));
+    }
+
+    protected function sendInitialPresenceStanza()
+    {
+        $this->send('<presence/>');
     }
 }

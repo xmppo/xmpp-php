@@ -29,9 +29,9 @@ class Example
         $client = new XmppClient($options);
         $client->connect();
 
-        $client->getRoster();
+        $client->iq->getRoster();
 
-        $client->sendMessage('Hello world', 'test@jabber.com');
+        $client->message->send('Hello world', 'test@jabber.com');
 
         $client->getResponse();
 

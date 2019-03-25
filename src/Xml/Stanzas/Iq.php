@@ -2,65 +2,83 @@
 
 namespace Norgul\Xmpp\Xml\Stanzas;
 
-use Norgul\Xmpp\Xml\AbstractXml;
-
-class Iq extends AbstractXml
+class Iq extends Stanza
 {
-    protected $xmlRootName = 'iq';
-
-    public function getRoster(): string
+    public function getRoster()
     {
-        $root = $this->setRoot('get');
-
-        $queryNode = $this->instance->createElement('query');
-        $queryNode->setAttribute('xmlns', 'jabber:iq:roster');
-
-        $root->appendChild($queryNode);
-
-        return $this->instance->saveXML($root);
+        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\"><query xmlns=\"jabber:iq:roster\"/></iq>");
     }
 
-    public function setResource(string $name): string
+    /**
+     * Add JID to roster and give him your hand picked name. Adding to group is optional
+     *
+     * @param string $name
+     * @param string $forJid
+     * @param string $from
+     * @param string|null $groupName
+     */
+    public function addToRoster(string $name, string $forJid, string $from, string $groupName = null)
     {
-        $root = $this->setRoot('set');
+        $group = $groupName ? "<group>{$groupName}</group>" : null;
+        $this->sendXml("<iq type=\"set\" id=\"{$this->uniqueId()}\" from=\"{$from}\">
+            <query xmlns=\"jabber:iq:roster\">
+            <item jid=\"{$forJid}\" name=\"{$name}\">
+            {$group}</item></query></iq>");
+    }
 
-        $bindNode = $this->instance->createElement('bind');
-        $bindNode->setAttribute('xmlns', 'urn:ietf:params:xml:ns:xmpp-bind');
+    public function removeFromRoster(string $jid, string $myJid)
+    {
+        $this->sendXml("<iq type=\"set\" id=\"{$this->uniqueId()}\" from=\"{$myJid}\">
+            <query xmlns=\"jabber:iq:roster\">
+            <item jid=\"{$jid}\" subscription=\"remove\"/>
+            </query></iq>");
+    }
 
-        $resourceNode = $this->instance->createElement('resource', $name);
-        $bindNode->appendChild($resourceNode);
+    public function setResource(string $name)
+    {
+        if (!trim($name))
+            return;
 
-        $root->appendChild($bindNode);
-
-        return $this->instance->saveXML($root);
+        $this->sendXml("<iq type=\"set\" id={$this->uniqueId()}>
+            <bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">
+            <resource>{$name}</resource>
+            </bind></iq>");
     }
 
     public function setGroup(string $name, string $forJid)
     {
-        $root = $this->setRoot('set');
-
-        $queryNode = $this->instance->createElement('query');
-        $queryNode->setAttribute('xmlns', 'jabber:iq:roster');
-
-        $root->appendChild($queryNode);
-
-        $itemNode = $this->instance->createElement('item');
-        $itemNode->setAttribute('jid', $forJid);
-
-        $queryNode->appendChild($itemNode);
-
-        $groupNode = $this->instance->createElement('group', $name);
-
-        $itemNode->appendChild($groupNode);
-
-        return $this->instance->saveXML($root);
+        $this->sendXml("<iq type=\"set\" id=\"{$this->uniqueId()}\">
+            <query xmlns=\"jabber:iq:roster\"><item jid=\"{$forJid}\">
+            <group>{$name}</group></item></query></iq>");
     }
 
-    private function setRoot(string $type)
+    public function getServerVersion()
     {
-        $root = $this->instance->createElement($this->xmlRootName);
-        $root->setAttribute('type', $type);
-        return $root;
+        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
+            <query xmlns=\"jabber:iq:version\"/></iq>");
     }
 
+    public function getServerFeatures()
+    {
+        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
+            <query xmlns=\"http://jabber.org/protocol/disco#info\"></query></iq>");
+    }
+
+    public function getServerTime()
+    {
+        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
+            <query xmlns=\"urn:xmpp:time\"/></iq>");
+    }
+
+    public function getFeatures(string $forJid)
+    {
+        $this->sendXml("<iq type=\"get\" to=\"{$forJid}\">
+            <query xmlns=\"http://jabber.org/protocol/disco#info\"></query></iq>");
+    }
+
+    public function ping()
+    {
+        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
+            <query xmlns=\"urn:xmpp:ping\"/></iq>");
+    }
 }

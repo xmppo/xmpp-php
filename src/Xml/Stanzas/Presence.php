@@ -2,42 +2,60 @@
 
 namespace Norgul\Xmpp\Xml\Stanzas;
 
-use Norgul\Xmpp\Xml\AbstractXml;
-
-class Presence extends AbstractXml
+class Presence extends Stanza
 {
-    protected $xmlRootName = 'presence';
+    const PRIORITY_UPPER_BOUND = 127;
+    const PRIORITY_LOWER_BOUND = -128;
 
-    public function setPresence(string $from, string $to, string $type = "subscribe"): string
+    public function subscribe(string $to)
     {
-        $root = $this->instance->createElement($this->xmlRootName);
-        $root->setAttribute("from", $from);
-        $root->setAttribute("to", $to);
-        $root->setAttribute("type", $type);
-
-        echo $this->instance->saveXML($root);
-        return $this->instance->saveXML($root);
+        $this->setPresence($to, 'subscribe');
     }
 
-    public function setPriority(int $value, string $forResource = null): string
+    public function unsubscribe(string $from)
     {
-        $root = $this->instance->createElement($this->xmlRootName);
+        $this->setPresence($from, 'unsubscribe');
+    }
 
-        /**
-         * XMPP priority limitations
-         */
-        if ($value > 127)
-            $value = 127;
-        else if ($value < -128)
-            $value = -128;
+    public function acceptSubscription(string $from)
+    {
+        $this->setPresence($from, 'subscribed');
+    }
 
-        if ($forResource)
-            $root->setAttribute("from", $forResource);
+    public function declineSubscription(string $from)
+    {
+        $this->setPresence($from, 'unsubscribed');
+    }
 
-        $priorityNode = $this->instance->createElement('priority', $value);
+    protected function setPresence(string $to, string $type = "subscribe")
+    {
+        $this->sendXml("<presence from=\"{$this->options->bareJid()}\" to=\"{$to}\" type=\"{$type}\"/>");
+    }
 
-        $root->appendChild($priorityNode);
+    /**
+     * Set priority to current resource by default, or optional other resource tied to the
+     * current username
+     * @param int $value
+     * @param string|null $forResource
+     */
+    public function setPriority(int $value, string $forResource = null)
+    {
+        if (!$forResource)
+            $from = self::quote($this->options->fullJid());
+        else
+            $from = $this->options->getUsername() . "/$forResource";
 
-        return $this->instance->saveXML($root);
+        $this->sendXml("<presence from=\"{$from}\">
+            <priority>{$this->limitPriority($value)}</priority></presence>");
+    }
+
+    protected function limitPriority(int $value): int
+    {
+        if ($value > self::PRIORITY_UPPER_BOUND)
+            return self::PRIORITY_UPPER_BOUND;
+        else if ($value < self::PRIORITY_LOWER_BOUND)
+            return self::PRIORITY_LOWER_BOUND;
+        else
+            return $value;
     }
 }

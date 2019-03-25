@@ -2,24 +2,41 @@
 
 namespace Norgul\Xmpp\Authentication;
 
-use Norgul\Xmpp\Authentication\AuthTypes\AuthTypeInterface;
-use Norgul\Xmpp\Xml;
+use Norgul\Xmpp\Authentication\AuthTypes\Authenticable;
+use Norgul\Xmpp\Authentication\AuthTypes\Plain;
+use Norgul\Xmpp\Options;
 
 class Auth
 {
-    /**
-     * Construct XML string to include credentials hashed based on AuthInterface type:
-     * PLAIN, DIGEST-MD5...
-     *
-     * @param AuthTypeInterface $authType
-     * @param $username
-     * @param $password
-     * @return mixed
-     */
-    public static function authenticate(AuthTypeInterface $authType, $username, $password)
-    {
-        $encodedCredentials = $authType::encodedCredentials($username, $password);
+    protected $authType;
+    protected $options;
 
-        return (new Xml\Auth())->authenticate($encodedCredentials, $authType->getName());
+    public function __construct(Options $options)
+    {
+        $this->options = $options;
+    }
+
+    public function authenticate()
+    {
+        $encodedCredentials = $this->getAuthType()->encodedCredentials();
+
+        return "<auth xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\" 
+                      mechanism=\"{$this->getAuthType()->getName()}\">
+                      {$encodedCredentials}
+                </auth>";
+    }
+
+    public function setAuthType(Authenticable $authType)
+    {
+        $this->authType = $authType;
+        return $this;
+    }
+
+    public function getAuthType()
+    {
+        if (!$this->authType)
+            $this->authType = new Plain($this->options);
+
+        return $this->authType;
     }
 }

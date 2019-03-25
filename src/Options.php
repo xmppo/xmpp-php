@@ -2,8 +2,6 @@
 
 namespace Norgul\Xmpp;
 
-use Norgul\Xmpp\Authentication\AuthTypes\AuthTypeInterface;
-use Norgul\Xmpp\Authentication\AuthTypes\Plain;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -35,19 +33,10 @@ class Options
      */
     protected $resource;
     /**
-     * Period in seconds during which the socket will be active when doing a socket_read()
-     */
-    protected $socketWaitPeriod = 1;
-    /**
      * PSR-3 logger interface
      * @var $logger LoggerInterface
      */
     protected $logger;
-    /**
-     * Auth type
-     * @var $authType AuthTypeInterface
-     */
-    protected $authType;
 
     public function __construct()
     {
@@ -127,17 +116,6 @@ class Options
         return $this;
     }
 
-    public function getSocketWaitPeriod(): int
-    {
-        return $this->socketWaitPeriod;
-    }
-
-    public function setSocketWaitPeriod(int $socketWaitPeriod): Options
-    {
-        $this->$socketWaitPeriod = $socketWaitPeriod;
-        return $this;
-    }
-
     public function getResource()
     {
         if (!$this->resource)
@@ -157,7 +135,7 @@ class Options
         return $this->protocol;
     }
 
-    public function setProtocol(int $protocol)
+    public function setProtocol(string $protocol)
     {
         $this->protocol = $protocol;
         return $this;
@@ -198,19 +176,5 @@ class Options
     {
         $this->logger = $logger;
         return $this;
-    }
-
-    public function setAuthType(AuthTypeInterface $authType)
-    {
-        $this->authType = $authType;
-        return $this;
-    }
-
-    public function getAuthType()
-    {
-        if (!$this->authType)
-            $this->authType = new Plain();
-
-        return $this->authType;
     }
 }

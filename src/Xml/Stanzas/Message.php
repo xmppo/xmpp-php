@@ -2,21 +2,12 @@
 
 namespace Norgul\Xmpp\Xml\Stanzas;
 
-use Norgul\Xmpp\Xml\AbstractXml;
-
-class Message extends AbstractXml
+class Message extends Stanza
 {
-    protected $xmlRootName = 'message';
-
-    public function sendMessage(string $body, string $to, string $type = "chat")
+    public function send(string $body, string $to, string $type = "chat")
     {
-        $root = $this->instance->createElement($this->xmlRootName);
-        $root->setAttribute('to', $to);
-        $root->setAttribute('type', $type);
-
-        $bodyNode = $this->instance->createElement('body', $body);
-        $root->appendChild($bodyNode);
-
-        return $this->instance->saveXML($root);
+        $to = self::quote($to);
+        $body = self::quote($body);
+        $this->sendXml("<message to=\"{$to}\" type=\"{$type}\"><body>{$body}</body></message>");
     }
 }
