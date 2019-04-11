@@ -7,25 +7,14 @@
 
 This is low level socket implementation for enabling PHP to 
 communicate with XMPP due to lack of such libraries online (at least ones I 
-could find). 
+could find that had decent documentation). 
 
 XMPP core documentation can be found [here](https://xmpp.org/rfcs/rfc6120.html).
 
-Current version is oriented towards simplicity and XMPP understanding under the
-hood. Should the need arise, I will expand the library, and by all means feel
-free to contribute to the repository. 
-
 # Installation requirements and example
 
-Project requirements are given in `composer.json` file (this assumes you know what 
-[Composer](https://getcomposer.org) is):
-
-```
-"require": {
-    "php": ">=7.0",
-    "psr/log": "^1.0"
-},
-```
+Project requirements are given in `composer.json` (
+[Composer website](https://getcomposer.org)):
 
 You can use this library in your project by running:
 

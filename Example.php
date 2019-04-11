@@ -33,10 +33,9 @@ class Example
 
         $client->message->send('Hello world', 'test@jabber.com');
 
-        $client->getResponse();
-
         do {
-            $client->getResponse();
+            $response = $client->getResponse();
+            $client->prettyPrint($response);
         } while (true);
 
         // Uncomment if you want to manually enter raw XML (or call a function) and see a server response
