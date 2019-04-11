@@ -23,8 +23,9 @@ class Socket
     {
         $this->connection = stream_socket_client($fullSocketAddress);
 
-        if (!$this->isAlive($this->connection))
+        if (!$this->isAlive($this->connection)) {
             throw new DeadSocket();
+        }
 
         stream_set_timeout($this->connection, $this->timeout);
     }

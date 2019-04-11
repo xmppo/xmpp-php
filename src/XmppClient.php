@@ -71,8 +71,9 @@ class XmppClient
 
     public function prettyPrint($response)
     {
-        if (!$response)
+        if (!$response) {
             return;
+        }
 
         $separator = "\n-------------\n";
         echo "{$separator} $response {$separator}";

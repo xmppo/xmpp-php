@@ -41,8 +41,9 @@ trait Xml
     {
         $matchByTag = preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched);
 
-        if (!$matchByTag || count($matched) <= 1)
+        if (!$matchByTag || count($matched) <= 1) {
             return [];
+        }
 
         $response = [];
 
