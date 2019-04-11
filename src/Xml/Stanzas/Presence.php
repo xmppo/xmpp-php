@@ -40,9 +40,9 @@ class Presence extends Stanza
      */
     public function setPriority(int $value, string $forResource = null)
     {
-        if (!$forResource) {
-            $from = self::quote($this->options->fullJid());
-        } else {
+        $from = self::quote($this->options->fullJid());
+
+        if ($forResource) {
             $from = $this->options->getUsername() . "/$forResource";
         }
 
@@ -56,8 +56,8 @@ class Presence extends Stanza
             return self::PRIORITY_UPPER_BOUND;
         } elseif ($value < self::PRIORITY_LOWER_BOUND) {
             return self::PRIORITY_LOWER_BOUND;
-        } else {
-            return $value;
         }
+
+        return $value;
     }
 }
