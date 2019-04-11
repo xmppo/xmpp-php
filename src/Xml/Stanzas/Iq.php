@@ -36,8 +36,9 @@ class Iq extends Stanza
 
     public function setResource(string $name)
     {
-        if (!trim($name))
+        if (!trim($name)) {
             return;
+        }
 
         $this->sendXml("<iq type=\"set\" id={$this->uniqueId()}>
             <bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">

@@ -48,9 +48,11 @@ class Example
     public function sendRawXML(XmppClient $client)
     {
         do {
-            $client->getResponse(true);
+            $response = $client->getResponse();
+            $client->prettyPrint($response);
 
-            // if you provide a function name here, (i.e. getRoster ...arg) the function will be called instead of sending raw XML
+            // if you provide a function name here, (i.e. getRoster ...arg)
+            // the function will be called instead of sending raw XML
             $line = readline("\nEnter XML: ");
 
             if ($line && $line != 'exit') {

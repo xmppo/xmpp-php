@@ -34,8 +34,9 @@ class Auth
 
     public function getAuthType()
     {
-        if (!$this->authType)
+        if (!$this->authType) {
             $this->authType = new Plain($this->options);
+        }
 
         return $this->authType;
     }
