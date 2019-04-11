@@ -2,8 +2,6 @@
 
 namespace Norgul\Xmpp\Authentication\AuthTypes;
 
-use Norgul\Xmpp\Xml\Xml;
-
 class DigestMD5 extends Authentication
 {
     protected $name = 'DIGEST-MD5';
@@ -11,6 +9,6 @@ class DigestMD5 extends Authentication
     public function encodedCredentials(): string
     {
         $credentials = "\x00{$this->options->getUsername()}\x00{$this->options->getPassword()}";
-        return XML::quote(sha1($credentials));
+        return self::quote(sha1($credentials));
     }
 }

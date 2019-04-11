@@ -8,10 +8,10 @@ use Norgul\Xmpp\Xml\Xml;
 
 abstract class Stanza
 {
+    use Xml;
+
     protected $socket;
     protected $options;
-
-    use Xml;
 
     public function __construct(Socket $socket, Options $options)
     {

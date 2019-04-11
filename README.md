@@ -115,10 +115,13 @@ one is type of message to be sent. This defaults to `chat`.
 Server responses (or server side continuous XML session to be exact) can be retrieved with 
 `$client->getResponse()`.
 
-This method also takes an optional boolean parameter `echoOutput` which is a 
+~~This method also takes an optional boolean parameter `echoOutput` which is a 
 flag indicating whether the response should be echoed out. This is useful for testing from
 terminal so when you set the flag to `true` you will be able to actually see the response
-which will be returned. For all other purposes this flag should be set to `false`.
+which will be returned. For all other purposes this flag should be set to `false`.~~
+
+If you would like to see the output of the received response in the console you can call the
+`$client->prettyPrint($response)` method. 
 
 In case you are not interested in complete response which comes from server, you may also use 
 `$client->getMessages()` which will match message tags with regex and return array of matched 

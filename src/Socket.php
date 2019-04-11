@@ -3,6 +3,7 @@
 namespace Norgul\Xmpp;
 
 use Exception;
+use Norgul\Xmpp\Exceptions\DeadSocket;
 
 class Socket
 {
@@ -13,22 +14,24 @@ class Socket
      */
     protected $timeout = 1;
 
+    /**
+     * Socket constructor.
+     * @param string $fullSocketAddress
+     * @throws DeadSocket
+     */
     public function __construct(string $fullSocketAddress)
     {
         $this->connection = stream_socket_client($fullSocketAddress);
-        $this->checkIfAlive($this->connection);
+
+        if(!$this->isAlive($this->connection))
+            throw new DeadSocket();
+
         stream_set_timeout($this->connection, $this->timeout);
     }
 
-    protected function checkIfAlive($socket)
+    protected function isAlive($socket)
     {
-        if ($socket !== false)
-            return;
-
-        $errorCode = socket_last_error();
-        $errorMsg = socket_strerror($errorCode);
-
-        die("Couldn't create socket: [$errorCode] $errorMsg");
+        return $socket !== false;
     }
 
     public function setTimeout($timeout)

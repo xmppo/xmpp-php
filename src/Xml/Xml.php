@@ -27,12 +27,6 @@ trait Xml
         return '</stream:stream>';
     }
 
-    /**
-     * Quote XML input.
-     *
-     * @param $input
-     * @return string
-     */
     public static function quote($input)
     {
         return htmlspecialchars($input, ENT_XML1, 'utf-8');

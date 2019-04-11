@@ -15,12 +15,9 @@ use Norgul\Xmpp\Xml\Xml;
 class XmppClient
 {
     use Xml;
-    /**
-     * @var Socket $socket
-     */
+
     protected $socket;
     protected $options;
-
     protected $auth;
 
     public $iq;
@@ -30,7 +27,14 @@ class XmppClient
     public function __construct(Options $options)
     {
         $this->options = $options;
-        $this->socket = new Socket($options->fullSocketAddress());
+
+        try {
+            $this->socket = new Socket($options->fullSocketAddress());
+        } catch (Exceptions\DeadSocket $e) {
+            echo $e->getMessage();
+            return;
+        }
+
         $this->iq = new Iq($this->socket, $options);
         $this->presence = new Presence($this->socket, $options);
         $this->message = new Message($this->socket, $options);
@@ -55,24 +59,23 @@ class XmppClient
         $this->socket->send($xml);
     }
 
-    /**
-     * Get response from server if any.
-     * @param bool $echoOutput
-     * @return string
-     */
-    public function getResponse($echoOutput = false): string
+    public function getResponse(): string
     {
         $response = '';
         while ($out = fgets($this->socket->connection)) {
             $response .= $out;
         }
 
-        if ($echoOutput && $response) {
-            $separator = "\n-------------\n";
-            echo "{$separator} $response {$separator}";
-        }
-
         return $response;
+    }
+
+    public function prettyPrint($response)
+    {
+        if (!$response)
+            return;
+
+        $separator = "\n-------------\n";
+        echo "{$separator} $response {$separator}";
     }
 
     /**

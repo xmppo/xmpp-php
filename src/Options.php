@@ -92,10 +92,10 @@ class Options
 
         if (count($usernameResource) > 1) {
             $this->setResource($usernameResource[1]);
-            $this->username = trim($usernameResource[0]);
-        } else {
-            $this->username = trim($username);
+            $username = $usernameResource[0];
         }
+
+        $this->username = trim($username);
 
         return $this;
     }
