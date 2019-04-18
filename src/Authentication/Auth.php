@@ -18,12 +18,11 @@ class Auth
 
     public function authenticate()
     {
+        $mechanism = $this->getAuthType()->getName();
         $encodedCredentials = $this->getAuthType()->encodedCredentials();
+        $nameSpace = "urn:ietf:params:xml:ns:xmpp-sasl";
 
-        return "<auth xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\" 
-                      mechanism=\"{$this->getAuthType()->getName()}\">
-                      {$encodedCredentials}
-                </auth>";
+        return "<auth xmlns='{$nameSpace}' mechanism='{$mechanism}'>{$encodedCredentials}</auth>";
     }
 
     public function setAuthType(Authenticable $authType)

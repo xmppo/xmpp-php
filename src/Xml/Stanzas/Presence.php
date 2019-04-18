@@ -29,7 +29,9 @@ class Presence extends Stanza
 
     protected function setPresence(string $to, string $type = "subscribe")
     {
-        $this->sendXml("<presence from=\"{$this->options->bareJid()}\" to=\"{$to}\" type=\"{$type}\"/>");
+        $xml = "<presence from='{$this->options->bareJid()}' to='{$to}' type='{$type}'/>";
+
+        $this->sendXml($xml);
     }
 
     /**
@@ -46,8 +48,10 @@ class Presence extends Stanza
             $from = $this->options->getUsername() . "/$forResource";
         }
 
-        $this->sendXml("<presence from=\"{$from}\">
-            <priority>{$this->limitPriority($value)}</priority></presence>");
+        $priority = "<priority>{$this->limitPriority($value)}</priority>";
+        $xml = "<presence from='{$from}'>{$priority}</presence>";
+
+        $this->sendXml($xml);
     }
 
     protected function limitPriority(int $value): int

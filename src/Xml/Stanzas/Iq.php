@@ -6,7 +6,10 @@ class Iq extends Stanza
 {
     public function getRoster()
     {
-        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\"><query xmlns=\"jabber:iq:roster\"/></iq>");
+        $query = "<query xmlns='jabber:iq:roster'/>";
+        $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     /**
@@ -20,18 +23,21 @@ class Iq extends Stanza
     public function addToRoster(string $name, string $forJid, string $from, string $groupName = null)
     {
         $group = $groupName ? "<group>{$groupName}</group>" : null;
-        $this->sendXml("<iq type=\"set\" id=\"{$this->uniqueId()}\" from=\"{$from}\">
-            <query xmlns=\"jabber:iq:roster\">
-            <item jid=\"{$forJid}\" name=\"{$name}\">
-            {$group}</item></query></iq>");
+        $item = "<item jid='{$forJid}' name='{$name}'>{$group}</item>";
+        $query = "<query xmlns='jabber:iq:roster'>{$item}</query>";
+        $xml = "<iq type='set' id='{$this->uniqueId()}' from='{$from}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function removeFromRoster(string $jid, string $myJid)
     {
-        $this->sendXml("<iq type=\"set\" id=\"{$this->uniqueId()}\" from=\"{$myJid}\">
-            <query xmlns=\"jabber:iq:roster\">
-            <item jid=\"{$jid}\" subscription=\"remove\"/>
-            </query></iq>");
+
+        $item = "<item jid='{$jid}' subscription='remove'/>";
+        $query = "<query xmlns='jabber:iq:roster'>{$item}</query>";
+        $xml = "<iq type='set' id='{$this->uniqueId()}' from='{$myJid}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function setResource(string $name)
@@ -40,46 +46,60 @@ class Iq extends Stanza
             return;
         }
 
-        $this->sendXml("<iq type=\"set\" id={$this->uniqueId()}>
-            <bind xmlns=\"urn:ietf:params:xml:ns:xmpp-bind\">
-            <resource>{$name}</resource>
-            </bind></iq>");
+        $resource = "<resource>{$name}</resource>";
+        $bind = "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'>{$resource}</bind>";
+        $xml = "<iq type='set' id='{$this->uniqueId()}'>{$bind}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function setGroup(string $name, string $forJid)
     {
-        $this->sendXml("<iq type=\"set\" id=\"{$this->uniqueId()}\">
-            <query xmlns=\"jabber:iq:roster\"><item jid=\"{$forJid}\">
-            <group>{$name}</group></item></query></iq>");
+        $group = "<group>{$name}</group>";
+        $item = "<item jid='{$forJid}'>{$group}</item>";
+        $query = "<query xmlns='jabber:iq:roster'>{$item}</query>";
+        $xml = "<iq type='set' id='{$this->uniqueId()}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function getServerVersion()
     {
-        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
-            <query xmlns=\"jabber:iq:version\"/></iq>");
+        $query = "<query xmlns='jabber:iq:version'/>";
+        $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function getServerFeatures()
     {
-        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
-            <query xmlns=\"http://jabber.org/protocol/disco#info\"></query></iq>");
+        $query = "<query xmlns='http://jabber.org/protocol/disco#info'></query>";
+        $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function getServerTime()
     {
-        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
-            <query xmlns=\"urn:xmpp:time\"/></iq>");
+        $query = "<query xmlns='urn:xmpp:time'/>";
+        $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function getFeatures(string $forJid)
     {
-        $this->sendXml("<iq type=\"get\" to=\"{$forJid}\">
-            <query xmlns=\"http://jabber.org/protocol/disco#info\"></query></iq>");
+        $query = "<query xmlns='http://jabber.org/protocol/disco#info'></query>";
+        $xml = "<iq type='get' to='{$forJid}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 
     public function ping()
     {
-        $this->sendXml("<iq type=\"get\" id=\"{$this->uniqueId()}\">
-            <query xmlns=\"urn:xmpp:ping\"/></iq>");
+        $query = "<query xmlns='urn:xmpp:ping'/>";
+        $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
+
+        $this->sendXml($xml);
     }
 }

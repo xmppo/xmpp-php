@@ -9,15 +9,12 @@ class Example
     protected static $username = 'foo';
     protected static $password = 'bar';
 
-    public function __construct()
+    public static function go()
     {
         ini_set('display_errors', 1);
         ini_set('display_startup_errors', 1);
         error_reporting(E_ALL);
-    }
 
-    public static function go()
-    {
         $options = new Options();
 
         $options
@@ -54,23 +51,27 @@ class Example
             // the function will be called instead of sending raw XML
             $line = readline("\nEnter XML: ");
 
-            if ($line && $line != 'exit') {
-                $parsedLine = explode(' ', $line);
-
-                if (method_exists($client, $parsedLine[0])) {
-                    if (count($parsedLine) < 2) {
-                        $client->{$parsedLine[0]}();
-                    } else {
-                        $client->{$parsedLine[0]}($parsedLine[1]);
-                    }
-                } else {
-                    if (@simplexml_load_string($line)) {
-                        $client->send($line);
-                    } else
-                        echo "This is not a method nor a valid XML";
-                }
+            if ($line == 'exit') {
+                break;
             }
 
+            $parsedLine = explode(' ', $line);
+
+            if (method_exists($client, $parsedLine[0])) {
+                if (count($parsedLine) < 2) {
+                    $client->{$parsedLine[0]}();
+                    continue;
+                }
+                $client->{$parsedLine[0]}($parsedLine[1]);
+                continue;
+            }
+
+            if (@simplexml_load_string($line)) {
+                $client->send($line);
+                continue;
+            }
+
+            echo "This is not a method nor a valid XML";
         } while ($line != 'exit');
     }
 }

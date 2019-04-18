@@ -13,10 +13,13 @@ trait Xml
      */
     public static function openXmlStream($host)
     {
-        return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-                <stream:stream to=\"{$host}\" 
-                xmlns:stream=\"http://etherx.jabber.org/streams\" 
-                xmlns=\"jabber:client\" version=\"1.0\">";
+        $xmlOpen = "<?xml version='1.0' encoding='UTF-8'?>";
+        $to = "to='{$host}'";
+        $stream = "xmlns:stream='http://etherx.jabber.org/streams'";
+        $client = "xmlns='jabber:client'";
+        $version = "version='1.0'";
+
+        return "{$xmlOpen}<stream:stream $to $stream $client $version>";
     }
 
     /**

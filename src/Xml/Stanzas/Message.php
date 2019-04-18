@@ -8,6 +8,10 @@ class Message extends Stanza
     {
         $to = self::quote($to);
         $body = self::quote($body);
-        $this->sendXml("<message to=\"{$to}\" type=\"{$type}\"><body>{$body}</body></message>");
+
+        $bodyXml = "<body>{$body}</body>";
+        $xml = "<message to='{$to}' type='{$type}'>{$bodyXml}</message>";
+
+        $this->sendXml($xml);
     }
 }
