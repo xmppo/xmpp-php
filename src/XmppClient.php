@@ -43,6 +43,7 @@ class XmppClient
     public function connect()
     {
         $this->openStream();
+        $this->startTls();
         $this->authenticate();
         $this->iq->setResource($this->options->getResource());
         $this->sendInitialPresenceStanza();
@@ -102,5 +103,20 @@ class XmppClient
     protected function sendInitialPresenceStanza()
     {
         $this->send('<presence/>');
+    }
+
+    protected function startTls()
+    {
+        if (!$this->options->getTls()) {
+            return;
+        }
+
+        $this->send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+
+        $response = $this->getResponse();
+        $this->prettyPrint($response);
+
+        stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_SSLv23_CLIENT);
+        $this->openStream();
     }
 }

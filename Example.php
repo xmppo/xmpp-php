@@ -11,10 +11,6 @@ class Example
 
     public static function go()
     {
-        ini_set('display_errors', 1);
-        ini_set('display_startup_errors', 1);
-        error_reporting(E_ALL);
-
         $options = new Options();
 
         $options
@@ -30,13 +26,13 @@ class Example
 
         $client->message->send('Hello world', 'test@jabber.com');
 
+        // Uncomment if you want to manually enter raw XML (or call a function) and see a server response
+//        (new self)->sendRawXML($client);
+
         do {
             $response = $client->getResponse();
             $client->prettyPrint($response);
         } while (true);
-
-        // Uncomment if you want to manually enter raw XML (or call a function) and see a server response
-//        (new self)->sendRawXML($client);
 
         $client->disconnect();
     }
@@ -75,6 +71,10 @@ class Example
         } while ($line != 'exit');
     }
 }
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 require __DIR__ . '/vendor/autoload.php';
 Example::go();

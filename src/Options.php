@@ -37,6 +37,10 @@ class Options
      * @var $logger LoggerInterface
      */
     protected $logger;
+    /**
+     * Does server support TLS?
+     */
+    protected $tls = false;
 
     public function __construct()
     {
@@ -177,5 +181,15 @@ class Options
     {
         $this->logger = $logger;
         return $this;
+    }
+
+    public function setTls(bool $enable)
+    {
+        $this->tls = $enable;
+    }
+
+    public function getTls(): bool
+    {
+        return $this->tls;
     }
 }
