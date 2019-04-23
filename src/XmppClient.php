@@ -43,7 +43,11 @@ class XmppClient
     public function connect()
     {
         $this->openStream();
-        $this->startTls();
+
+        if ($this->options->usingTls()) {
+            $this->startTls();
+        }
+
         $this->authenticate();
         $this->iq->setResource($this->options->getResource());
         $this->sendInitialPresenceStanza();
@@ -107,10 +111,6 @@ class XmppClient
 
     protected function startTls()
     {
-        if (!$this->options->getTls()) {
-            return;
-        }
-
         $this->send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 
         $response = $this->getResponse();

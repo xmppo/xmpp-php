@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp;
 
+use Norgul\Xmpp\Authentication\AuthTypes\Authenticable;
+use Norgul\Xmpp\Authentication\AuthTypes\Plain;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -40,7 +42,11 @@ class Options
     /**
      * Does server support TLS?
      */
-    protected $tls = false;
+    protected $useTls = false;
+    /**
+     * @var Authenticable $authType
+     */
+    protected $authType;
 
     public function __construct()
     {
@@ -183,13 +189,28 @@ class Options
         return $this;
     }
 
-    public function setTls(bool $enable)
+    public function setUseTls(bool $enable)
     {
-        $this->tls = $enable;
+        $this->useTls = $enable;
     }
 
-    public function getTls(): bool
+    public function usingTls(): bool
     {
-        return $this->tls;
+        return $this->useTls;
+    }
+
+    public function getAuthType()
+    {
+        if (!$this->authType) {
+            $this->setAuthType(new Plain($this));
+        }
+
+        return $this->authType;
+    }
+
+    public function setAuthType($authType)
+    {
+        $this->authType = $authType;
+        return $this;
     }
 }

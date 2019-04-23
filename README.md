@@ -93,6 +93,14 @@ $client->connect($options);
 
 Current version supports `PLAIN` and `DIGEST-MD5` auth methods. 
 
+## TLS
+
+If server supports TLS connections, you should use `setUseTls(true)` function on the
+`Options` instance so that TLS communication is triggered. 
+
+**This is still not tested really well so please open issues if you find something
+wrong**
+
 ## Sending messages
 
 `$client->message->send()` takes 3 parameters of which the last one is optional. First parameter
@@ -159,6 +167,7 @@ $options
     ->setProtocol($protocol)  // defaults to TCP
     ->setResource($resource)  // defaults to 'norgul_machine' string + timestamp
     ->setLogger($logger)      // PSR-4 logger instance
+    ->setAuthType($authType)  // Takes on classes which extend Authenticable
 ```
 
 ## Socket options
