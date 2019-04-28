@@ -40,10 +40,11 @@ class Options
      */
     protected $logger;
     /**
-     * Does server support TLS?
+     * Use TLS if available
      */
-    protected $useTls = false;
+    protected $useTls = true;
     /**
+     * Auth type (Authentication/AuthTypes/)
      * @var Authenticable $authType
      */
     protected $authType;
@@ -208,7 +209,7 @@ class Options
         return $this->authType;
     }
 
-    public function setAuthType($authType)
+    public function setAuthType(Authenticable $authType)
     {
         $this->authType = $authType;
         return $this;

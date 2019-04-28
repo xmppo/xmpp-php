@@ -167,7 +167,7 @@ $options
     ->setProtocol($protocol)  // defaults to TCP
     ->setResource($resource)  // defaults to 'norgul_machine' string + timestamp
     ->setLogger($logger)      // PSR-4 logger instance
-    ->setAuthType($authType)  // Takes on classes which extend Authenticable
+    ->setAuthType($authType)  // Takes on classes which implement Authenticable
 ```
 
 ## Socket options
