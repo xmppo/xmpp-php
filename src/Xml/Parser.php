@@ -54,14 +54,3 @@ trait Parser
     }
 }
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-
-$xml = <<<ttt
-<?xml version='1.0'?><stream:stream xml:lang='en' xmlns:stream='http://etherx.jabber.org/streams' version='1.0' xmlns='jabber:client' from='616.pub' id='78150744-1f58-4b91-acf7-b46aabeacd80'><stream:features><starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'><required/></starttls></stream:features><proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/><mechanisms xmlns='urn:ietf:params:xml:ns:xmpp-sasl'><mechanism>PLAIN</mechanism><mechanism>SCRAM-SHA-1-PLUS</mechanism><mechanism>SCRAM-SHA-1</mechanism></mechanisms>
-ttt;
-
-//echo print_r(Parser::supportedAuthMethods($xml));
-echo Parser::canProceed($xml) ? 't' : 'f';
