@@ -26,6 +26,8 @@ class XmppClient
     public $presence;
     public $message;
 
+    public $xmlSession;
+
     public function __construct(Options $options)
     {
         $this->options = $options;
@@ -40,6 +42,8 @@ class XmppClient
         $this->iq = new Iq($this->socket, $options);
         $this->presence = new Presence($this->socket, $options);
         $this->message = new Message($this->socket, $options);
+
+        $this->xmlSession = fopen('response.xml', 'r');
     }
 
     public function connect()
@@ -59,6 +63,7 @@ class XmppClient
     public function send(string $xml)
     {
         $this->socket->send($xml);
+        $this->options->getLogger()->info("REQUEST::" . __METHOD__ . '::' . __LINE__ . $xml);
     }
 
     public function getResponse(): string
@@ -92,20 +97,13 @@ class XmppClient
 
     protected function authenticate()
     {
-        $response = $this->getResponse();
-        // write to log
+        $this->responseLog();
 
-        if (self::isTlsRequired($response) && $this->options->usingTls()) {
+        if (self::isTlsRequired($this->readFile()) && $this->options->usingTls()) {
             $this->startTls();
         }
 
         $this->auth = new Auth($this->options);
-
-        $response = $this->getResponse();
-        // write to log
-
-        $authMethods = self::supportedAuthMethods($response);
-        // choose
 
         $this->send($this->auth->authenticate());
         $this->openStream();
@@ -115,12 +113,11 @@ class XmppClient
     {
         $this->send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 
-        $response = $this->getResponse();
-        // write to log
+        $this->responseLog();
 
-        if (!self::canProceed($response)) {
-            return;
-            //throw new \Exception();
+        if (!self::canProceed($this->readFile())) {
+            $this->options->getLogger()->error("TLS authentication failed. 
+            Trying to continue but will most likely fail.");
         }
 
         stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_SSLv23_CLIENT);
@@ -130,10 +127,23 @@ class XmppClient
     protected function openStream()
     {
         $this->send(self::openXmlStream($this->options->getHost()));
+        $this->responseLog();
     }
 
     protected function sendInitialPresenceStanza()
     {
         $this->send('<presence/>');
+    }
+
+    protected function responseLog()
+    {
+        $response = $this->getResponse();
+        $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
+        return $response;
+    }
+
+    protected function readFile()
+    {
+        return fread($this->xmlSession, filesize('response.xml'));
     }
 }

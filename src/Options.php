@@ -6,7 +6,6 @@ use Norgul\Xmpp\Authentication\AuthTypes\Authenticable;
 use Norgul\Xmpp\Authentication\AuthTypes\Plain;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
 class Options
 {
@@ -51,7 +50,7 @@ class Options
 
     public function __construct()
     {
-        $this->logger = new NullLogger();
+        $this->logger = new ResponseLogger();
     }
 
     public function getHost()
