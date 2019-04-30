@@ -85,7 +85,7 @@ class XmppClient
             Trying to continue but will most likely fail.");
         }
 
-        stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_SSLv23_CLIENT);
+        stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
         $this->openStream();
     }
 
