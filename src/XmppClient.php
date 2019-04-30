@@ -33,7 +33,7 @@ class XmppClient
         $this->options = $options;
 
         try {
-            $this->socket = new Socket($options->fullSocketAddress());
+            $this->socket = new Socket($options);
         } catch (Exceptions\DeadSocket $e) {
             echo $e->getMessage();
             return;
@@ -92,19 +92,12 @@ class XmppClient
     public function send(string $xml)
     {
         $this->socket->send($xml);
-        $this->options->getLogger()->info("REQUEST::" . __METHOD__ . '::' . __LINE__ . $xml);
         $this->getResponse();
     }
 
     public function getResponse(): string
     {
-        $response = '';
-        while ($out = fgets($this->socket->connection)) {
-            $response .= $out;
-        }
-
-        $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
-        return $response;
+        return $this->socket->receive();
     }
 
     /**
