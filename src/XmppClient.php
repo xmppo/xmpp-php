@@ -54,16 +54,46 @@ class XmppClient
         $this->sendInitialPresenceStanza();
     }
 
-    public function disconnect()
+    protected function openStream()
     {
-        $this->send(self::closeXmlStream());
-        fclose($this->socket->connection);
+        $this->send(self::openXmlStream($this->options->getHost()));
+    }
+
+    protected function authenticate()
+    {
+        if (self::isTlsRequired($this->readFile()) && $this->options->usingTls()) {
+            $this->startTls();
+        }
+
+        $this->auth = new Auth($this->options);
+
+        $this->send($this->auth->authenticate());
+        $this->openStream();
+    }
+
+    protected function sendInitialPresenceStanza()
+    {
+        $this->send('<presence/>');
+    }
+
+    protected function startTls()
+    {
+        $this->send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+
+        if (!self::canProceed($this->readFile())) {
+            $this->options->getLogger()->error("TLS authentication failed. 
+            Trying to continue but will most likely fail.");
+        }
+
+        stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_SSLv23_CLIENT);
+        $this->openStream();
     }
 
     public function send(string $xml)
     {
         $this->socket->send($xml);
         $this->options->getLogger()->info("REQUEST::" . __METHOD__ . '::' . __LINE__ . $xml);
+        $this->getResponse();
     }
 
     public function getResponse(): string
@@ -77,6 +107,15 @@ class XmppClient
         return $response;
     }
 
+    /**
+     * Extracting messages from the response
+     * @return array
+     */
+    public function getMessages(): array
+    {
+        return self::parseTag($this->getResponse(), "message");
+    }
+
     public function prettyPrint($response)
     {
         if (!$response) {
@@ -87,57 +126,14 @@ class XmppClient
         echo "{$separator} $response {$separator}";
     }
 
-    /**
-     * Extracting messages from the response
-     * @return array
-     */
-    public function getMessages(): array
-    {
-        return self::parseTag($this->getResponse(), "message");
-    }
-
-    protected function authenticate()
-    {
-        $this->getResponse();
-
-        if (self::isTlsRequired($this->readFile()) && $this->options->usingTls()) {
-            $this->startTls();
-        }
-
-        $this->auth = new Auth($this->options);
-
-        $this->send($this->auth->authenticate());
-        $this->openStream();
-    }
-
-    protected function startTls()
-    {
-        $this->send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
-
-        $this->getResponse();
-
-        if (!self::canProceed($this->readFile())) {
-            $this->options->getLogger()->error("TLS authentication failed. 
-            Trying to continue but will most likely fail.");
-        }
-
-        stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_SSLv23_CLIENT);
-        $this->openStream();
-    }
-
-    protected function openStream()
-    {
-        $this->send(self::openXmlStream($this->options->getHost()));
-        $this->getResponse();
-    }
-
-    protected function sendInitialPresenceStanza()
-    {
-        $this->send('<presence/>');
-    }
-
     protected function readFile()
     {
         return fread($this->xmlSession, filesize('response.xml'));
+    }
+
+    public function disconnect()
+    {
+        $this->send(self::closeXmlStream());
+        fclose($this->socket->connection);
     }
 }
