@@ -52,5 +52,16 @@ trait Parser
 
         return $match[1];
     }
+
+    public static function roster($xml)
+    {
+        preg_match_all("#<iq.*?type='result'>(.*?)<\/iq>#", $xml, $match);
+
+        if (count($match) < 1) {
+            return [];
+        }
+
+        return $match[1];
+    }
 }
 

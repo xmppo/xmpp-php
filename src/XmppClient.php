@@ -73,6 +73,7 @@ class XmppClient
             $response .= $out;
         }
 
+        $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
         return $response;
     }
 
@@ -97,7 +98,7 @@ class XmppClient
 
     protected function authenticate()
     {
-        $this->responseLog();
+        $this->getResponse();
 
         if (self::isTlsRequired($this->readFile()) && $this->options->usingTls()) {
             $this->startTls();
@@ -113,7 +114,7 @@ class XmppClient
     {
         $this->send("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 
-        $this->responseLog();
+        $this->getResponse();
 
         if (!self::canProceed($this->readFile())) {
             $this->options->getLogger()->error("TLS authentication failed. 
@@ -127,19 +128,12 @@ class XmppClient
     protected function openStream()
     {
         $this->send(self::openXmlStream($this->options->getHost()));
-        $this->responseLog();
+        $this->getResponse();
     }
 
     protected function sendInitialPresenceStanza()
     {
         $this->send('<presence/>');
-    }
-
-    protected function responseLog()
-    {
-        $response = $this->getResponse();
-        $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
-        return $response;
     }
 
     protected function readFile()
