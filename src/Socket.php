@@ -2,7 +2,6 @@
 
 namespace Norgul\Xmpp;
 
-use Exception;
 use Norgul\Xmpp\Exceptions\DeadSocket;
 
 class Socket
@@ -32,30 +31,19 @@ class Socket
         $this->options = $options;
     }
 
-    protected function isAlive($socket)
+    public function disconnect()
     {
-        return $socket !== false;
-    }
-
-    public function setTimeout($timeout)
-    {
-        $this->timeout = $timeout;
+        fclose($this->connection);
     }
 
     /**
      * Sending XML stanzas to open socket
      * @param $xml
-     * @return bool
      */
     public function send(string $xml)
     {
-        try {
-            fwrite($this->connection, $xml);
-            $this->options->getLogger()->info("REQUEST::" . __METHOD__ . '::' . __LINE__ . $xml);
-        } catch (Exception $e) {
-            return false;
-        }
-        return true;
+        fwrite($this->connection, $xml);
+        $this->options->getLogger()->info("REQUEST::" . __METHOD__ . '::' . __LINE__ . $xml);
     }
 
     public function receive()
@@ -67,5 +55,21 @@ class Socket
 
         $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
         return $response;
+    }
+
+    public function autoAnswerSend($xml)
+    {
+        $this->send($xml);
+        $this->receive();
+    }
+
+    protected function isAlive($socket)
+    {
+        return $socket !== false;
+    }
+
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
     }
 }

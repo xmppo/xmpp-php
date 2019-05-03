@@ -1,6 +1,6 @@
 <?php
 
-namespace Norgul\Xmpp\Authentication\AuthTypes;
+namespace Norgul\Xmpp\AuthTypes;
 
 interface Authenticable
 {

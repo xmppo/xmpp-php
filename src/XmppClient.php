@@ -2,8 +2,7 @@
 
 namespace Norgul\Xmpp;
 
-use Norgul\Xmpp\Authentication\Auth;
-use Norgul\Xmpp\Xml\Parser;
+use Norgul\Xmpp\Xml\Stanzas\Auth;
 use Norgul\Xmpp\Xml\Stanzas\Iq;
 use Norgul\Xmpp\Xml\Stanzas\Message;
 use Norgul\Xmpp\Xml\Stanzas\Presence;
@@ -16,17 +15,13 @@ use Norgul\Xmpp\Xml\Xml;
 class XmppClient
 {
     use Xml;
-    use Parser;
 
     protected $socket;
     protected $options;
-    protected $auth;
 
     public $iq;
     public $presence;
     public $message;
-
-    public $xmlSession;
 
     public function __construct(Options $options)
     {
@@ -42,8 +37,6 @@ class XmppClient
         $this->iq = new Iq($this->socket, $options);
         $this->presence = new Presence($this->socket, $options);
         $this->message = new Message($this->socket, $options);
-
-        $this->xmlSession = fopen('response.xml', 'r');
     }
 
     public function connect()
@@ -52,47 +45,6 @@ class XmppClient
         $this->authenticate();
         $this->iq->setResource($this->options->getResource());
         $this->sendInitialPresenceStanza();
-    }
-
-    protected function openStream()
-    {
-        $this->autoAnswerSend(self::openXmlStream($this->options->getHost()));
-    }
-
-    protected function authenticate()
-    {
-        if (self::isTlsRequired($this->readFile()) && $this->options->usingTls()) {
-            $this->startTls();
-        }
-
-        $this->auth = new Auth($this->options);
-
-        $this->autoAnswerSend($this->auth->authenticate());
-        $this->openStream();
-    }
-
-    protected function sendInitialPresenceStanza()
-    {
-        $this->autoAnswerSend('<presence/>');
-    }
-
-    protected function startTls()
-    {
-        $this->autoAnswerSend("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
-
-        if (!self::canProceed($this->readFile())) {
-            $this->options->getLogger()->error("TLS authentication failed. 
-            Trying to continue but will most likely fail.");
-        }
-
-        stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
-        $this->openStream();
-    }
-
-    protected function autoAnswerSend(string $xml)
-    {
-        $this->send($xml);
-        $this->getResponse();
     }
 
     public function send(string $xml)
@@ -124,14 +76,26 @@ class XmppClient
         echo "{$separator} $response {$separator}";
     }
 
-    protected function readFile()
-    {
-        return fread($this->xmlSession, filesize('response.xml'));
-    }
-
     public function disconnect()
     {
-        $this->autoAnswerSend(self::closeXmlStream());
-        fclose($this->socket->connection);
+        $this->socket->autoAnswerSend(self::closeXmlStream());
+        $this->socket->disconnect();
+    }
+
+    protected function openStream()
+    {
+        $openStreamXml = self::openXmlStream($this->options->getHost());
+        $this->socket->autoAnswerSend($openStreamXml);
+    }
+
+    protected function authenticate()
+    {
+        $auth = new Auth($this->socket, $this->options);
+        $auth->authenticate();
+    }
+
+    protected function sendInitialPresenceStanza()
+    {
+        $this->socket->autoAnswerSend('<presence/>');
     }
 }

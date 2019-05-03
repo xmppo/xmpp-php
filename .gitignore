@@ -13,3 +13,15 @@ composer.lock
 npm-debug.log
 yarn-error.log
 .phpunit.result.cache
+
+Example2\.php
+
+Example3\.php
+
+Example4\.php
+
+request\.xml
+
+response\.xml
+
+*.log

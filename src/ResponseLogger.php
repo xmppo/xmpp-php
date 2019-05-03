@@ -27,7 +27,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function emergency($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -43,7 +43,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function alert($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -58,7 +58,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function critical($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -72,7 +72,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function error($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -88,7 +88,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function warning($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -101,7 +101,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function notice($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -116,9 +116,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function info($message, array $context = array())
     {
-        $file = $this->fileSwitcher($message);
-        $message = $this->clean($message);
-        fwrite($file, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**“
@@ -131,7 +129,7 @@ class ResponseLogger implements LoggerInterface
      */
     public function debug($message, array $context = array())
     {
-        fwrite($this->log, $this->interpolate($message, $context) . "\n");
+        $this->writeToFile($message, $context);
     }
 
     /**
@@ -213,5 +211,12 @@ class ResponseLogger implements LoggerInterface
         }
 
         return $match[1][0];
+    }
+
+    protected function writeToFile($message, array $context)
+    {
+        $file = $this->fileSwitcher($message);
+        $message = $this->clean($message);
+        fwrite($file, $this->interpolate($message, $context) . "\n");
     }
 }

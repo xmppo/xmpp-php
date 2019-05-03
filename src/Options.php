@@ -2,8 +2,8 @@
 
 namespace Norgul\Xmpp;
 
-use Norgul\Xmpp\Authentication\AuthTypes\Authenticable;
-use Norgul\Xmpp\Authentication\AuthTypes\Plain;
+use Norgul\Xmpp\AuthTypes\Authenticable;
+use Norgul\Xmpp\AuthTypes\Plain;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
