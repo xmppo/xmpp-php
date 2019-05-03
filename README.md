@@ -30,20 +30,16 @@ point to your XMPP server and from project root run `php Example.php`.
 Version 2.0 onward is done with major refactoring in readability department. I was
 trying to get all methods more readable and understandable to the first time code reader.
 
-Also there was a major change in the structure in a way that you had a general
-`XmppClient.php` class before, which had all the necessary methods for interaction with the 
-library. I noticed it was getting rather large, so I have taken the only logical step
-and divided it. 
+`XmppClient.php` class has been stripped out of unnecessary functionalities as I 
+imagined the class being only a user friendly interface for interacting with XMPP server
+without the need to know the logic behind it.
 
-Since XMPP is all about 3 major stanzas, (IQ, Message and Presence), I've 
-created separate classes which are doing their job depending on which stanza does the
-request belong to.
+Since XMPP is all about 3 major stanzas, (**IQ, Message and Presence**), I've 
+created separate classes which are dependant on socket implementation so that you 
+can directly send XML by calling a stanza method. 
 
-Socket logic was also pushed to stanza classes as a dependency so that, again for 
-the readability sake, the code can be fairly easy to understand. 
-
-What was before a: `$client->sendMessage()` is now a `$client->message->send()`. The
-major change is that another layer is added to the equation so that `XmppClient` is 
+Also what was before a: `$client->sendMessage()` is now a `$client->message->send()`. 
+The major change is that another layer is added to the equation so that `XmppClient` is 
 basically a stanza wrapper with only client relevant functions left inside the class
 (i.e. `connect()` and `disconnect()`).
 
@@ -95,11 +91,11 @@ Current version supports `PLAIN` and `DIGEST-MD5` auth methods.
 
 ## TLS
 
-If server supports TLS connections, you should use `setUseTls(true)` function on the
-`Options` instance so that TLS communication is triggered. 
+TLS is now supported by default. If server has support for TLS, library will 
+automatically try to connect with TLS and make the connection secure. 
 
-**This is still not tested really well so please open issues if you find something
-wrong**
+If you'd like to explicitly disable this functionality, you can use `setUseTls(false)` 
+function on the `Options` instance so that TLS communication is disabled. 
 
 ## Sending messages
 
@@ -166,7 +162,7 @@ and commented in the code directly in the `Options` class:
 $options
     ->setProtocol($protocol)  // defaults to TCP
     ->setResource($resource)  // defaults to 'norgul_machine' string + timestamp
-    ->setLogger($logger)      // PSR-4 logger instance
+    ->setLogger($logger)      // PSR-4 logger instance (logging explained below)
     ->setAuthType($authType)  // Takes on classes which implement Authenticable
 ```
 
@@ -175,6 +171,17 @@ Most of the socket options are set by default so there is no need to temper
 with this class, however you can additionally change the timeout for the period 
 the socket will be alive when doing a `socket_read()`, and you can do that with
 `$socket->setTimeout()`.
+
+## Logging
+
+By default the library is creating 3 files in its root folder:
+
+`request.xml` -> containing XML's sent to the server
+`response.xml` -> containing XML's received from the server
+`xmpp.log` -> will contain all other logs (currently empty)
+
+You can easily see the communication between server and client this way and
+debug if something's wrong. 
 
 # Other
 

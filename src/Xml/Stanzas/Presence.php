@@ -31,7 +31,7 @@ class Presence extends Stanza
     {
         $xml = "<presence from='{$this->options->bareJid()}' to='{$to}' type='{$type}'/>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     /**
@@ -51,7 +51,7 @@ class Presence extends Stanza
         $priority = "<priority>{$this->limitPriority($value)}</priority>";
         $xml = "<presence from='{$from}'>{$priority}</presence>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     protected function limitPriority(int $value): int

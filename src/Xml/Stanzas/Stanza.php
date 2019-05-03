@@ -23,11 +23,6 @@ abstract class Stanza
         $this->responseFile = fopen(self::RESPONSE_FILE_PATH, 'r');
     }
 
-    protected function sendXml(string $xml)
-    {
-        $this->socket->send($xml);
-    }
-
     protected function uniqueId(): string
     {
         return uniqid();

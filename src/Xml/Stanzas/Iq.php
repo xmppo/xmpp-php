@@ -9,7 +9,7 @@ class Iq extends Stanza
         $query = "<query xmlns='jabber:iq:roster'/>";
         $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     /**
@@ -27,7 +27,7 @@ class Iq extends Stanza
         $query = "<query xmlns='jabber:iq:roster'>{$item}</query>";
         $xml = "<iq type='set' id='{$this->uniqueId()}' from='{$from}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function removeFromRoster(string $jid, string $myJid)
@@ -37,7 +37,7 @@ class Iq extends Stanza
         $query = "<query xmlns='jabber:iq:roster'>{$item}</query>";
         $xml = "<iq type='set' id='{$this->uniqueId()}' from='{$myJid}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function setResource(string $name)
@@ -50,7 +50,7 @@ class Iq extends Stanza
         $bind = "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'>{$resource}</bind>";
         $xml = "<iq type='set' id='{$this->uniqueId()}'>{$bind}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function setGroup(string $name, string $forJid)
@@ -60,7 +60,7 @@ class Iq extends Stanza
         $query = "<query xmlns='jabber:iq:roster'>{$item}</query>";
         $xml = "<iq type='set' id='{$this->uniqueId()}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function getServerVersion()
@@ -68,7 +68,7 @@ class Iq extends Stanza
         $query = "<query xmlns='jabber:iq:version'/>";
         $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function getServerFeatures()
@@ -76,7 +76,7 @@ class Iq extends Stanza
         $query = "<query xmlns='http://jabber.org/protocol/disco#info'></query>";
         $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function getServerTime()
@@ -84,7 +84,7 @@ class Iq extends Stanza
         $query = "<query xmlns='urn:xmpp:time'/>";
         $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function getFeatures(string $forJid)
@@ -92,7 +92,7 @@ class Iq extends Stanza
         $query = "<query xmlns='http://jabber.org/protocol/disco#info'></query>";
         $xml = "<iq type='get' to='{$forJid}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 
     public function ping()
@@ -100,6 +100,6 @@ class Iq extends Stanza
         $query = "<query xmlns='urn:xmpp:ping'/>";
         $xml = "<iq type='get' id='{$this->uniqueId()}'>{$query}</iq>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 }

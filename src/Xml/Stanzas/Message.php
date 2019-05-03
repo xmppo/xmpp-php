@@ -12,6 +12,6 @@ class Message extends Stanza
         $bodyXml = "<body>{$body}</body>";
         $xml = "<message to='{$to}' type='{$type}'>{$bodyXml}</message>";
 
-        $this->sendXml($xml);
+        $this->socket->send($xml);
     }
 }
