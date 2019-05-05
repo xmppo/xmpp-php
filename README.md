@@ -176,9 +176,9 @@ the socket will be alive when doing a `socket_read()`, and you can do that with
 
 Upon new established session the library is creating 3 files in `logs/` folder:
 
-`request.xml` -> containing XML's sent to the server
-`response.xml` -> containing XML's received from the server
-`xmpp.log` -> will contain all other logs (currently empty)
+- `request.xml` -> containing XML's sent to the server
+- `response.xml` -> containing XML's received from the server
+- `xmpp.log` -> will contain all other logs (currently empty)
 
 While this is good for testing a single session, concurrent ones will render
 those files unusable as they will get merged request/response from multiple
