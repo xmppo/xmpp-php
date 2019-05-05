@@ -4,6 +4,7 @@ namespace Norgul\Xmpp;
 
 use Norgul\Xmpp\AuthTypes\Authenticable;
 use Norgul\Xmpp\AuthTypes\Plain;
+use Norgul\Xmpp\Loggers\ResponseLogger;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
@@ -181,12 +182,6 @@ class Options
     public function getLogger()
     {
         return $this->logger;
-    }
-
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-        return $this;
     }
 
     public function setUseTls(bool $enable)

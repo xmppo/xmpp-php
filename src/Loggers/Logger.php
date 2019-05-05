@@ -1,21 +1,27 @@
 <?php
 
-namespace Norgul\Xmpp;
+namespace Norgul\Xmpp\Loggers;
 
 use Psr\Log\LoggerInterface;
 
-class ResponseLogger implements LoggerInterface
+abstract class Logger implements LoggerInterface
 {
-    protected $log;
-    protected $response;
-    protected $request;
+    public $log;
+    public $response;
+    public $request;
+
+    const LOG_FOLDER = "logs";
 
     public function __construct()
     {
-        $this->log = fopen('xmpp.log', 'w');
-        $this->response = fopen('response.xml', 'w');
-        $this->request = fopen('request.xml', 'w');
+        $logPath = $this->getLogPath();
+
+        $this->log = fopen($logPath . 'xmpp.log', 'w');
+        $this->response = fopen($logPath . 'response.xml', 'w');
+        $this->request = fopen($logPath . 'request.xml', 'w');
     }
+
+    abstract protected function getLogPath();
 
     /**
      * System is unusable.
@@ -218,5 +224,11 @@ class ResponseLogger implements LoggerInterface
         $interpolated = strtr($message, $replace);
 
         return $interpolated;
+    }
+
+    public function getFilePathFromResource($resource)
+    {
+        $metaData = stream_get_meta_data($resource);
+        return $metaData["uri"];
     }
 }

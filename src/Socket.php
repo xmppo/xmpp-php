@@ -53,6 +53,10 @@ class Socket
             $response .= $out;
         }
 
+        if (!$response) {
+            return '';
+        }
+
         $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
         return $response;
     }
