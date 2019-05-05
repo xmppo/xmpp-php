@@ -8,10 +8,6 @@ use Norgul\Xmpp\Xml\Stanzas\Message;
 use Norgul\Xmpp\Xml\Stanzas\Presence;
 use Norgul\Xmpp\Xml\Xml;
 
-/**
- * Class Socket
- * @package Norgul\Xmpp
- */
 class XmppClient
 {
     use Xml;
@@ -19,6 +15,7 @@ class XmppClient
     protected $socket;
     protected $options;
 
+    public $auth;
     public $iq;
     public $presence;
     public $message;
@@ -34,6 +31,7 @@ class XmppClient
             return;
         }
 
+        $this->auth = new Auth($this->socket, $options);
         $this->iq = new Iq($this->socket, $options);
         $this->presence = new Presence($this->socket, $options);
         $this->message = new Message($this->socket, $options);
@@ -42,7 +40,7 @@ class XmppClient
     public function connect()
     {
         $this->openStream();
-        $this->authenticate();
+        $this->auth->authenticate();
         $this->iq->setResource($this->options->getResource());
         $this->sendInitialPresenceStanza();
     }
@@ -63,7 +61,7 @@ class XmppClient
      */
     public function getMessages(): array
     {
-        return self::parseTag($this->getResponse(), "message");
+        return $this->message->receive();
     }
 
     public function prettyPrint($response)
@@ -86,12 +84,6 @@ class XmppClient
     {
         $openStreamXml = self::openXmlStream($this->options->getHost());
         $this->socket->autoAnswerSend($openStreamXml);
-    }
-
-    protected function authenticate()
-    {
-        $auth = new Auth($this->socket, $this->options);
-        $auth->authenticate();
     }
 
     protected function sendInitialPresenceStanza()

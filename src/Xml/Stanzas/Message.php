@@ -14,4 +14,9 @@ class Message extends Stanza
 
         $this->socket->send($xml);
     }
+
+    public function receive()
+    {
+        return self::parseTag($this->socket->receive(), "message");
+    }
 }

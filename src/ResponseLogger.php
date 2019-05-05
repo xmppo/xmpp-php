@@ -146,29 +146,6 @@ class ResponseLogger implements LoggerInterface
         fwrite($this->log, "$level {$this->interpolate($message, $context)}\n");
     }
 
-    /**
-     * Interpolates context values into the message placeholders.
-     * @param $message
-     * @param array $context
-     * @return string
-     */
-    protected function interpolate($message, array $context = array())
-    {
-        // build a replacement array with braces around the context keys
-        $replace = array();
-        foreach ($context as $key => $val) {
-            // check that the value can be casted to string
-            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
-                $replace['{' . $key . '}'] = $val;
-            }
-        }
-
-        // interpolate replacement values into the message and return
-        $interpolated = strtr($message, $replace);
-
-        return $interpolated;
-    }
-
     protected function matchXml(string $interpolated, $file, $type)
     {
         preg_match_all("#($type)::.*?::\d+(.*)#", $interpolated, $match);
@@ -180,6 +157,13 @@ class ResponseLogger implements LoggerInterface
         fwrite($file, $match[1][0]);
 
         return true;
+    }
+
+    protected function writeToFile($message, array $context)
+    {
+        $file = $this->fileSwitcher($message);
+        $message = $this->clean($message);
+        fwrite($file, $this->interpolate($message, $context) . "\n");
     }
 
     protected function fileSwitcher($log)
@@ -213,10 +197,26 @@ class ResponseLogger implements LoggerInterface
         return $match[1][0];
     }
 
-    protected function writeToFile($message, array $context)
+    /**
+     * Interpolates context values into the message placeholders.
+     * @param $message
+     * @param array $context
+     * @return string
+     */
+    protected function interpolate($message, array $context = array())
     {
-        $file = $this->fileSwitcher($message);
-        $message = $this->clean($message);
-        fwrite($file, $this->interpolate($message, $context) . "\n");
+        // build a replacement array with braces around the context keys
+        $replace = array();
+        foreach ($context as $key => $val) {
+            // check that the value can be casted to string
+            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+                $replace['{' . $key . '}'] = $val;
+            }
+        }
+
+        // interpolate replacement values into the message and return
+        $interpolated = strtr($message, $replace);
+
+        return $interpolated;
     }
 }
