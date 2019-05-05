@@ -4,7 +4,7 @@ namespace Norgul\Xmpp;
 
 use Norgul\Xmpp\AuthTypes\Authenticable;
 use Norgul\Xmpp\AuthTypes\Plain;
-use Norgul\Xmpp\Loggers\ResponseLogger;
+use Norgul\Xmpp\Loggers\FullLogger;
 use Norgul\Xmpp\Loggers\SimpleLogger;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -49,14 +49,6 @@ class Options
      * @var Authenticable $authType
      */
     protected $authType;
-    /**
-     * Simple log set to false means that upon each established session
-     * 3 new log files will be created (request, response, log). Setting
-     * it to true will overwrite same 3 files over and over, but be
-     * warned: establishing multiple concurrent sessions will render those
-     * log files unusable
-     */
-    protected $simpleLog = true;
 
     public function getHost()
     {
@@ -183,10 +175,15 @@ class Options
         return "$username@$host";
     }
 
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function getLogger()
     {
         if (!$this->logger) {
-            $this->logger = $this->simpleLog ? new SimpleLogger() : new ResponseLogger();
+            $this->logger = new SimpleLogger();
         }
 
         return $this->logger;
@@ -215,10 +212,5 @@ class Options
     {
         $this->authType = $authType;
         return $this;
-    }
-
-    public function setSimpleLog(bool $flag)
-    {
-        $this->simpleLog = $flag;
     }
 }

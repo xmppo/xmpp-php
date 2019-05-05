@@ -180,19 +180,21 @@ Upon new established session the library is creating 3 files in `logs/` folder:
 - `response.xml` -> containing XML's received from the server
 - `xmpp.log` -> will contain all other logs (currently empty)
 
-While this is good for testing a single session, concurrent ones will render
-those files unusable as they will get merged request/response from multiple
+In order to circumvent this,  you can manually set logger when instantiating 
+`Options` with `setLogger($logger)` where you can put any of the loggers from
+ `Loggers/` folder (defaults to `SimpleLogger`).
+  
+- `SimpleLogger` - creates only 3 files and overwrites them upon each established 
+session. While this is good for testing a single session, concurrent ones will 
+render those files unusable as they will get merged request/response from multiple 
 sessions. 
+- `FullLogger` - creates 3 files on each established session. These files are 
+prefixed by time in `YMD` format, plus time and unique ID. It may be cumbersome 
+to have 3 files created on each session, but it is a great way to easily see 
+the communication between server and client this way and debug if something's 
+wrong.
 
-In order to circumvent this, `Options` now has a possibility to set a flag with
-`setSimpleLog(false)` (defaults to `true`) which will create additional 3 files
-for each established session. 
-
-These files are prefixed by time in `YMD` format, plus time and unique ID. 
-
-It may be cumbersome to have 3 files created on each session, but it is a great
-way to easily see the communication between server and client this way and
-debug if something's wrong.
+- `NoLogger` - doesn't log anything.
 
 # Other
 

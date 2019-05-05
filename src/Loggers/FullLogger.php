@@ -2,7 +2,7 @@
 
 namespace Norgul\Xmpp\Loggers;
 
-class ResponseLogger extends Logger
+class FullLogger extends Logger
 {
     protected function getLogPath()
     {
