@@ -6,6 +6,6 @@ class SimpleLogger extends Logger
 {
     protected function getLogPath()
     {
-        return '';
+        return self::LOG_FOLDER . '/';
     }
 }

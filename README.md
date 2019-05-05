@@ -174,14 +174,25 @@ the socket will be alive when doing a `socket_read()`, and you can do that with
 
 ## Logging
 
-By default the library is creating 3 files in its root folder:
+Upon new established session the library is creating 3 files in `logs/` folder:
 
 `request.xml` -> containing XML's sent to the server
 `response.xml` -> containing XML's received from the server
 `xmpp.log` -> will contain all other logs (currently empty)
 
-You can easily see the communication between server and client this way and
-debug if something's wrong. 
+While this is good for testing a single session, concurrent ones will render
+those files unusable as they will get merged request/response from multiple
+sessions. 
+
+In order to circumvent this, `Options` now has a possibility to set a flag with
+`setSimpleLog(false)` (defaults to `true`) which will create additional 3 files
+for each established session. 
+
+These files are prefixed by time in `YMD` format, plus time and unique ID. 
+
+It may be cumbersome to have 3 files created on each session, but it is a great
+way to easily see the communication between server and client this way and
+debug if something's wrong.
 
 # Other
 

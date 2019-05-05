@@ -14,6 +14,10 @@ abstract class Logger implements LoggerInterface
 
     public function __construct()
     {
+        if (!file_exists(self::LOG_FOLDER)) {
+            mkdir(self::LOG_FOLDER, 0777, true);
+        }
+
         $logPath = $this->getLogPath();
 
         $this->log = fopen($logPath . 'xmpp.log', 'w');
