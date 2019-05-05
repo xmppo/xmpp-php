@@ -25,3 +25,5 @@ request\.xml
 response\.xml
 
 *.log
+
+\.php_cs\.cache
