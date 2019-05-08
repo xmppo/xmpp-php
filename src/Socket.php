@@ -2,6 +2,7 @@
 
 namespace Norgul\Xmpp;
 
+use Exception;
 use Norgul\Xmpp\Exceptions\DeadSocket;
 
 class Socket
@@ -42,8 +43,12 @@ class Socket
      */
     public function send(string $xml)
     {
-        fwrite($this->connection, $xml);
-        $this->options->getLogger()->log("REQUEST::" . __METHOD__ . '::' . __LINE__ . " $xml");
+        try {
+            fwrite($this->connection, $xml);
+            $this->options->getLogger()->log("REQUEST::" . __METHOD__ . '::' . __LINE__ . " $xml");
+        } catch (Exception $e) {
+            $this->options->getLogger()->log(__METHOD__ . '::' . __LINE__ . " fwrite() failed " . $e->getMessage());
+        }
     }
 
     public function receive()

@@ -94,7 +94,7 @@ class XmppClient
 
     protected function initSession($sessionId)
     {
-        session_start();
         session_id($sessionId ?: uniqid());
+        session_start();
     }
 }

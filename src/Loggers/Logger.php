@@ -21,7 +21,7 @@ class Logger implements Loggable
     public function log($message)
     {
         $prefix = date("Y.m.d H:m:s") . " " . session_id();
-        fwrite($this->log, $prefix . " $message\n");
+        $this->safeWrite($this->log, $prefix . " $message\n");
 //        $this->parseBySession(session_id());
     }
 
@@ -50,7 +50,7 @@ class Logger implements Loggable
             return false;
         }
 
-        fwrite($file, $match[1][0]);
+        $this->safeWrite($file, $match[1][0]);
 
         return true;
     }
@@ -70,5 +70,14 @@ class Logger implements Loggable
     {
         $metaData = stream_get_meta_data($resource);
         return $metaData["uri"];
+    }
+
+    protected function safeWrite($file, $message)
+    {
+        try {
+            fwrite($file, $message);
+        } catch (\Exception $e) {
+            // silent fail
+        }
     }
 }
