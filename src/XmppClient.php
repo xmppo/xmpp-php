@@ -20,7 +20,7 @@ class XmppClient
     public $presence;
     public $message;
 
-    public function __construct(Options $options)
+    public function __construct(Options $options, $sessionId = null)
     {
         $this->options = $options;
 
@@ -35,6 +35,7 @@ class XmppClient
         $this->iq = new Iq($this->socket, $options);
         $this->presence = new Presence($this->socket, $options);
         $this->message = new Message($this->socket, $options);
+        $this->initSession($sessionId);
     }
 
     public function connect()
@@ -83,11 +84,17 @@ class XmppClient
     protected function openStream()
     {
         $openStreamXml = self::openXmlStream($this->options->getHost());
-        $this->socket->autoAnswerSend($openStreamXml);
+        $this->socket->send($openStreamXml);
     }
 
     protected function sendInitialPresenceStanza()
     {
-        $this->socket->autoAnswerSend('<presence/>');
+        $this->socket->send('<presence/>');
+    }
+
+    protected function initSession($sessionId)
+    {
+        session_start();
+        session_id($sessionId ?: uniqid());
     }
 }

@@ -6,7 +6,8 @@ class Auth extends Stanza
 {
     public function authenticate()
     {
-        if (self::isTlsRequired($this->readResponseFile()) && $this->options->usingTls()) {
+        $response = $this->socket->receive();
+        if (self::isTlsRequired($response) && $this->options->usingTls()) {
             $this->startTls();
             $this->socket->autoAnswerSend(self::openXmlStream($this->options->getHost()));
         }
@@ -23,9 +24,9 @@ class Auth extends Stanza
 
     protected function startTls()
     {
-        $this->socket->autoAnswerSend("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
+        $response = $this->socket->autoAnswerSend("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>");
 
-        if (!self::canProceed($this->readResponseFile())) {
+        if (!self::canProceed($response)) {
             $this->options->getLogger()->error("TLS authentication failed. 
             Trying to continue but will most likely fail.");
         }

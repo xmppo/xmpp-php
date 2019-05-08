@@ -2,15 +2,12 @@
 
 namespace Norgul\Xmpp\Loggers;
 
-use Psr\Log\LoggerInterface;
-
-abstract class Logger implements LoggerInterface
+class Logger implements Loggable
 {
     public $log;
-    public $response;
-    public $request;
 
     const LOG_FOLDER = "logs";
+    const LOG_FILE = "xmpp.log";
 
     public function __construct()
     {
@@ -18,142 +15,31 @@ abstract class Logger implements LoggerInterface
             mkdir(self::LOG_FOLDER, 0777, true);
         }
 
-        $logPath = $this->getLogPath();
-
-        $this->log = fopen($logPath . 'xmpp.log', 'w');
-        $this->response = fopen($logPath . 'response.xml', 'w');
-        $this->request = fopen($logPath . 'request.xml', 'w');
+        $this->log = fopen(self::LOG_FOLDER . '/' . self::LOG_FILE, 'a');
     }
 
-    abstract protected function getLogPath();
-
-    /**
-     * System is unusable.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function emergency($message, array $context = array())
+    public function log($message)
     {
-        $this->writeToFile($message, $context);
+        $prefix = date("Y.m.d H:m:s") . " " . session_id();
+        fwrite($this->log, $prefix . " $message\n");
+//        $this->parseBySession(session_id());
     }
 
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function alert($message, array $context = array())
+    public function parseBySession($sessionId)
     {
-        $this->writeToFile($message, $context);
-    }
+        $logFile = fopen(self::LOG_FOLDER . '/' . self::LOG_FILE, 'r');
+        $responseFilePath = $this->getFilePathFromResource($logFile);
+        $log = fread($logFile, filesize($responseFilePath));
 
-    /**
-     * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function critical($message, array $context = array())
-    {
-        $this->writeToFile($message, $context);
-    }
+        preg_match_all("#\d{4}\.\d{2}.\d{2} \d{2}:\d{2}:\d{2} (.*?) (REQUEST|RESPONSE).*?(<.*>)#", $log, $matches);
 
-    /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function error($message, array $context = array())
-    {
-        $this->writeToFile($message, $context);
-    }
+        echo print_r($matches, true);
 
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function warning($message, array $context = array())
-    {
-        $this->writeToFile($message, $context);
-    }
+        if (count($matches) < 2 || !is_array($matches[1]) || empty($matches[1])) {
+            return;
+        }
 
-    /**
-     * Normal but significant events.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function notice($message, array $context = array())
-    {
-        $this->writeToFile($message, $context);
-    }
-
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function info($message, array $context = array())
-    {
-        $this->writeToFile($message, $context);
-    }
-
-    /**“
-     * Detailed debug information.
-     *
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function debug($message, array $context = array())
-    {
-        $this->writeToFile($message, $context);
-    }
-
-    /**
-     * Logs with an arbitrary level.
-     *
-     * @param mixed $level
-     * @param string $message
-     * @param array $context
-     *
-     * @return void
-     */
-    public function log($level, $message, array $context = array())
-    {
-        fwrite($this->log, "$level {$this->interpolate($message, $context)}\n");
+//        $response = fopen(self::LOG_FOLDER . '/' . $sessionId . '_response.log', 'w');
     }
 
     protected function matchXml(string $interpolated, $file, $type)
@@ -169,33 +55,6 @@ abstract class Logger implements LoggerInterface
         return true;
     }
 
-    protected function writeToFile($message, array $context)
-    {
-        $file = $this->fileSwitcher($message);
-        $message = $this->clean($message);
-        fwrite($file, $this->interpolate($message, $context) . "\n");
-    }
-
-    protected function fileSwitcher($log)
-    {
-        preg_match_all("#(.*?)::.*?::\d+(.*)#", $log, $match);
-
-        if (count($match) < 1 || !is_array($match[1]) || empty($match[1])) {
-            return $this->log;
-        }
-
-        switch ($match[1][0]) {
-            case "REQUEST":
-                return $this->request;
-                break;
-            case "RESPONSE":
-                return $this->response;
-                break;
-            default:
-                return $this->log;
-        }
-    }
-
     protected function clean($log)
     {
         preg_match_all("#.*?::.*?::\d+(.*)#", $log, $match);
@@ -205,29 +64,6 @@ abstract class Logger implements LoggerInterface
         }
 
         return $match[1][0];
-    }
-
-    /**
-     * Interpolates context values into the message placeholders.
-     * @param $message
-     * @param array $context
-     * @return string
-     */
-    protected function interpolate($message, array $context = array())
-    {
-        // build a replacement array with braces around the context keys
-        $replace = array();
-        foreach ($context as $key => $val) {
-            // check that the value can be casted to string
-            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
-                $replace['{' . $key . '}'] = $val;
-            }
-        }
-
-        // interpolate replacement values into the message and return
-        $interpolated = strtr($message, $replace);
-
-        return $interpolated;
     }
 
     public function getFilePathFromResource($resource)

@@ -43,7 +43,7 @@ class Socket
     public function send(string $xml)
     {
         fwrite($this->connection, $xml);
-        $this->options->getLogger()->info("REQUEST::" . __METHOD__ . '::' . __LINE__ . $xml);
+        $this->options->getLogger()->log("REQUEST::" . __METHOD__ . '::' . __LINE__ . " $xml");
     }
 
     public function receive()
@@ -57,14 +57,14 @@ class Socket
             return '';
         }
 
-        $this->options->getLogger()->info("RESPONSE::" . __METHOD__ . '::' . __LINE__ . $response);
+        $this->options->getLogger()->log("RESPONSE::" . __METHOD__ . '::' . __LINE__ . " $response");
         return $response;
     }
 
     public function autoAnswerSend($xml)
     {
         $this->send($xml);
-        $this->receive();
+        return $this->receive();
     }
 
     protected function isAlive($socket)

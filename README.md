@@ -77,8 +77,8 @@ Once this is set you can instantiate a new `XmppClient` object and pass the `Opt
 
 ## Connecting to server
 ```
-$client = new XmppClient();
-$client->connect($options);
+$client = new XmppClient($options);
+$client->connect();
 ```
 
 `$client->connect()` method does a few things:
@@ -88,6 +88,9 @@ $client->connect($options);
 4. Starts the initial communication with the server, bare minimum to get you started
 
 Current version supports `PLAIN` and `DIGEST-MD5` auth methods. 
+
+`XmppClient` class takes in second optional parameter `$sessionId` to which you can forward session ID from your
+system. Id's are used in logs to differentiate sessions established. 
 
 ## TLS
 
@@ -107,11 +110,6 @@ one is type of message to be sent. This defaults to `chat`.
 
 Server responses (or server side continuous XML session to be exact) can be retrieved with 
 `$client->getResponse()`.
-
-~~This method also takes an optional boolean parameter `echoOutput` which is a 
-flag indicating whether the response should be echoed out. This is useful for testing from
-terminal so when you set the flag to `true` you will be able to actually see the response
-which will be returned. For all other purposes this flag should be set to `false`.~~
 
 If you would like to see the output of the received response in the console you can call the
 `$client->prettyPrint($response)` method. 
@@ -162,7 +160,7 @@ and commented in the code directly in the `Options` class:
 $options
     ->setProtocol($protocol)  // defaults to TCP
     ->setResource($resource)  // defaults to 'norgul_machine' string + timestamp
-    ->setLogger($logger)      // PSR-4 logger instance (logging explained below)
+    ->setLogger($logger)      // logger instance (logging explained below)
     ->setAuthType($authType)  // Takes on classes which implement Authenticable
 ```
 
@@ -174,28 +172,11 @@ the socket will be alive when doing a `socket_read()`, and you can do that with
 
 ## Logging
 
-Upon new established session the library is creating 3 files in `logs/` folder:
+Upon new established session the library is creating a `xmpp.log` log file in `logs/` folder:
 
-- `request.xml` -> containing XML's sent to the server
-- `response.xml` -> containing XML's received from the server
-- `xmpp.log` -> will contain all other logs (currently empty)
-
-In order to circumvent this,  you can manually set logger when instantiating 
-`Options` with `setLogger($logger)` where you can put any of the loggers from
- `Loggers/` folder (defaults to `SimpleLogger`).
+You can manually set logger when instantiating `Options` with `setLogger($logger)`. The method accepts
+any object which implements `Loggable` interface so you can create your own implementation. 
   
-- `SimpleLogger` - creates only 3 files and overwrites them upon each established 
-session. While this is good for testing a single session, concurrent ones will 
-render those files unusable as they will get merged request/response from multiple 
-sessions. 
-- `FullLogger` - creates 3 files on each established session. These files are 
-prefixed by time in `YMD` format, plus time and unique ID. It may be cumbersome 
-to have 3 files created on each session, but it is a great way to easily see 
-the communication between server and client this way and debug if something's 
-wrong.
-
-- `NoLogger` - doesn't log anything.
-
 # Other
 
 `Example.php` has a `sendRawXML()` method which can be helpful with debugging. Method works in a way

@@ -27,7 +27,7 @@ abstract class Stanza
     protected function readResponseFile()
     {
         $logger = $this->options->getLogger();
-        $responseFilePath = $logger->getFilePathFromResource($logger->response);
+        $responseFilePath = $logger->getFilePathFromResource($logger->log);
         $responseFile = fopen($responseFilePath, 'r');
 
         return fread($responseFile, filesize($responseFilePath));
