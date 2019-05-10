@@ -35,7 +35,10 @@ class XmppClient
         $this->iq = new Iq($this->socket, $options);
         $this->presence = new Presence($this->socket, $options);
         $this->message = new Message($this->socket, $options);
-        $this->initSession($sessionId);
+
+        if ($this->options->getSessionManager() !== false) {
+            $this->initSession($sessionId);
+        }
     }
 
     public function connect()
