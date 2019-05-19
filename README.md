@@ -26,29 +26,7 @@ You can see usage example in `Example.php` file by changing credentials to
 point to your XMPP server and from project root run `php Example.php`.
 
 # Library usage
-## Brief introduction and v2.0 changelog
-Version 2.0 onward is done with major refactoring in readability department. I was
-trying to get all methods more readable and understandable to the first time code reader.
-
-`XmppClient.php` class has been stripped out of unnecessary functionalities as I 
-imagined the class being only a user friendly interface for interacting with XMPP server
-without the need to know the logic behind it.
-
-Since XMPP is all about 3 major stanzas, (**IQ, Message and Presence**), I've 
-created separate classes which are dependant on socket implementation so that you 
-can directly send XML by calling a stanza method. 
-
-Also what was before a: `$client->sendMessage()` is now a `$client->message->send()`. 
-The major change is that another layer is added to the equation so that `XmppClient` is 
-basically a stanza wrapper with only client relevant functions left inside the class
-(i.e. `connect()` and `disconnect()`).
-
-Current logic thus is `$client->STANZA->METHOD()`.
-
-I would appreciate all the feedback I can get as I most probably broke something in the
-process :). 
-
-## Init
+## Initialization
 In order to start using the library you first need to instantiate a new `Options` 
 class. Host, username and password are mandatory fields, while port number, if omitted,
 will default to `5222` which is XMPP default. 
@@ -75,11 +53,24 @@ request, so once set it should not be changed.
 
 Once this is set you can instantiate a new `XmppClient` object and pass the `Options` object in.
 
-## Connecting to server
+## XMPP client class explanation
+Since XMPP is all about 3 major stanzas, (**IQ, Message and Presence**), I've 
+created separate classes which are dependant on socket implementation so that you 
+can directly send XML by calling a stanza method. 
+
+This means that 3 stanzas have been made available from `XmppClient` class constructor
+to be used like a chained method on client's concrete class. 
+
+Current logic thus is `$client->STANZA->METHOD()`. For example:
+
 ```
-$client = new XmppClient($options);
-$client->connect();
+$client->iq->getRoster();
+$client->message->send();
+$client->presence->subscribe();
 ```
+
+## Connecting to the server
+Beside being a stanza wrapper, `XmppClient` class offers a few public methods.
 
 `$client->connect()` method does a few things:
 1. Connects to the socket which was initialized in `XmppClient` constructor
@@ -89,30 +80,27 @@ $client->connect();
 
 Current version supports `PLAIN` and `DIGEST-MD5` auth methods. 
 
-`XmppClient` class takes in second optional parameter `$sessionId` to which you can forward session ID from your
-system. Id's are used in logs to differentiate sessions established. 
-
-## TLS
-
-TLS is now supported by default. If server has support for TLS, library will 
+TLS is supported by default. If server has support for TLS, library will 
 automatically try to connect with TLS and make the connection secure. 
 
 If you'd like to explicitly disable this functionality, you can use `setUseTls(false)` 
 function on the `Options` instance so that TLS communication is disabled. 
 
-## Sending messages
+## Sending raw data
+`send()` message is exposed as being public in `XmppClient` class, and its intention
+is to send raw XML data to the server. For it to work correctly, XML which you send
+has to be valid XML. 
 
-`$client->message->send()` takes 3 parameters of which the last one is optional. First parameter
-is the actual message you'd like to send, second one is recipient of the message and third
-one is type of message to be sent. This defaults to `chat`.
-
-## Receiving messages and other responses
-
+## Getting raw response
 Server responses (or server side continuous XML session to be exact) can be retrieved with 
-`$client->getResponse()`.
+`$client->getResponse()`. This should be used in an infinite loop or for more sustainable
+solution in some WebSocket solution like [Ratchet](http://socketo.me/) if you'd like to 
+see continuous stream of everything coming from the server.
 
 If you would like to see the output of the received response in the console you can call the
-`$client->prettyPrint($response)` method. 
+`$client->prettyPrint($response)` method.
+
+## Receiving messages and other responses
 
 In case you are not interested in complete response which comes from server, you may also use 
 `$client->getMessages()` which will match message tags with regex and return array of matched 
@@ -126,32 +114,57 @@ do {
 } while (true);
 ```
 
-## Roster
+## Disconnect
+Disconnect method sends closing XML to the server to end the currently open session and
+closes the open socket. 
 
-`$client->iq->getRoster()` takes no arguments and fetches current authenticated user roster. 
+# Stanza method breakdown
+Remember from [here](#xmpp-client-class-explanation) -> `$client->STANZA->METHOD()`
 
-## Priority
+## Message
+`send()` - sending a message to someone. Takes 3 parameters of which the last one is 
+optional. First parameter is the actual message you'd like to send (body), second 
+one is recipient of the message and third one is type of message to be sent. This 
+defaults to `chat`.
 
-`$client->presence->setPriority()` sets priority for given resource. First argument is an integer 
+You can find possible types in [this RFC document](https://xmpp.org/rfcs/rfc3921.html#stanzas)
+
+`receive()` - covered in [this section](#receiving-messages-and-other-responses)
+
+## IQ
+`getRoster()` - takes no arguments and fetches current authenticated user roster. 
+
+`setGroup()` - puts a given user in group you provide. Method takes two arguments: 
+first one being the group name which you will attach to given user, and other 
+being JID of that user. 
+
+## Presence
+
+`setPriority()` - sets priority for given resource. First argument is an integer 
 `-128 <> 127`. If no second argument is given, priority will be set for currently used resource.
 Other resource can be provided as a second argument whereas the priority will be set for that
 specific resource. 
 
-## Presence
+`subscribe()` - takes JID as an argument and asks that user for presence.
 
-`$client->presence->subscribe()` takes JID as an argument and asks that user for presence.
+`acceptSubscription()` - takes JID as an argument and accepts presence from that user.
 
-`$client->presence->acceptSubscription()` takes JID as an argument and accepts presence from that user.
+`declineSubscription()` - takes JID as an argument and declines presence from that user.
 
-`$client->presence->declineSubscription()` takes JID as an argument and declines presence from that user.
+## Sessions
 
-## Group
+Sessions are currently being used only to differentiate logs if multiple connections
+are being made. 
 
-`$client->iq->setGroup()` puts a given user in group you provide. Method takes two arguments: 
-first one being the group name which you will attach to given user, and other 
-being JID of that user. 
+`XmppClient` class takes in second optional parameter `$sessionId` to which you can 
+forward session ID from your system, or it will be assigned automatically. 
 
-## More options (not required)
+You can disable sessions through `Options` object (`$options->setSessionManager(false)`), 
+as they can cause collision with already established sessions if being used inside 
+frameworks or similar. Needless to say if this is disabled, forwarding a second parameter
+to `XmppClient` will not establish a new session. 
+
+# More options (not required)
 
 `Options` object can take more options which may be chained but are not required. These are explained
 and commented in the code directly in the `Options` class:
