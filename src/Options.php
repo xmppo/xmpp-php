@@ -58,7 +58,8 @@ class Options
     public function getHost()
     {
         if (!$this->host) {
-            $this->logger->error(__METHOD__ . '::' . __LINE__ . "No host found, please set the host variable");
+            $this->getLogger()->error(__METHOD__ . '::' . __LINE__ .
+                " No host found, please set the host variable");
             throw new InvalidArgumentException();
         }
 
@@ -85,7 +86,8 @@ class Options
     public function getUsername()
     {
         if (!$this->username) {
-            $this->logger->error(__METHOD__ . '::' . __LINE__ . "No username found, please set the username variable");
+            $this->getLogger()->error(__METHOD__ . '::' . __LINE__ .
+                " No username found, please set the username variable");
             throw new InvalidArgumentException();
         }
 
@@ -115,7 +117,8 @@ class Options
     public function getPassword()
     {
         if (!$this->password) {
-            $this->logger->error(__METHOD__ . '::' . __LINE__ . "No password found, please set the password variable");
+            $this->getLogger()->error(__METHOD__ . '::' . __LINE__ .
+                " No password found, please set the password variable");
             throw new InvalidArgumentException();
         }
 
@@ -227,7 +230,6 @@ class Options
     public function setSessionManager(bool $sessionManager)
     {
         $this->sessionManager = $sessionManager;
-
         return $this;
     }
 }

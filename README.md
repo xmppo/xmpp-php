@@ -36,7 +36,7 @@ the resource will be added automatically. You can override this by explicitly se
 resource with `$client->iq->setResource()`. In the second case the username will be automatically
 parsed to `username` and `resource` variables. In case of `JID/resource/xyz` format, everything
 after second slash will be ignored. If both `JID/resource` is present as well as using the
-`$client->iq->setResource()` method, second one will take precedence. 
+`$client->iq->setResource()` method, which ever was defined last will take precedence. 
 
 ```
 $options = new Options();
