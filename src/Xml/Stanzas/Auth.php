@@ -18,6 +18,7 @@ class Auth extends Stanza
 
         $xml = $this->generateAuthXml($options->getAuthType());
         $this->socket->send($xml);
+        $this->socket->send(self::openXmlStream($options->getHost()));
     }
 
     protected function startTls()
@@ -27,7 +28,8 @@ class Auth extends Stanza
 
         if (!self::canProceed($response)) {
             $this->socket->getOptions()->getLogger()->error(__METHOD__ . '::' . __LINE__ .
-                "TLS authentication failed. Trying to continue but will most likely fail.");
+                " TLS authentication failed. Trying to continue but will most likely fail.");
+            return;
         }
 
         stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);

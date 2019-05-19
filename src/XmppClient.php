@@ -15,13 +15,28 @@ class XmppClient
 {
     use Xml;
 
+    /**
+     * @var $socket Socket
+     */
     protected $socket;
     protected $options;
     protected $responseBuffer;
 
+    /**
+     * @var $auth Auth
+     */
     public $auth;
+    /**
+     * @var $iq Iq
+     */
     public $iq;
+    /**
+     * @var $presence Presence
+     */
     public $presence;
+    /**
+     * @var $message Message
+     */
     public $message;
 
     public function __construct(Options $options, $sessionId = null)
@@ -29,12 +44,8 @@ class XmppClient
         $this->options = $options;
         $this->responseBuffer = new Response();
 
-        $this->socket = $this->initSocket();
-
-        $this->auth = new Auth($this->socket);
-        $this->iq = new Iq($this->socket);
-        $this->presence = new Presence($this->socket);
-        $this->message = new Message($this->socket);
+        $this->initSocket();
+        $this->initStanzas($this->socket);
 
         $this->initSession($sessionId);
     }
@@ -122,19 +133,28 @@ class XmppClient
 
     protected function reconnect()
     {
-        $this->socket = $this->initSocket();
-
         $this->responseBuffer->flush();
+        $this->disconnect();
+        $this->initSocket();
+        $this->initStanzas($this->socket);
         $this->connect();
     }
 
-    protected function initSocket(): Socket
+    protected function initSocket()
     {
         try {
-            return new Socket($this->options, $this->responseBuffer);
+            $this->socket = new Socket($this->options, $this->responseBuffer);
         } catch (DeadSocket $e) {
             $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
             return null;
         }
+    }
+
+    protected function initStanzas($socket)
+    {
+        $this->auth = new Auth($socket);
+        $this->iq = new Iq($socket);
+        $this->presence = new Presence($socket);
+        $this->message = new Message($socket);
     }
 }
