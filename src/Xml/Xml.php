@@ -37,11 +37,6 @@ trait Xml
         return htmlspecialchars($input, ENT_XML1, 'utf-8');
     }
 
-    /**
-     * @param $rawResponse
-     * @param string $tag
-     * @return array
-     */
     public static function parseTag($rawResponse, string $tag): array
     {
         $matchByTag = preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched);
@@ -119,6 +114,10 @@ trait Xml
         return $match[1];
     }
 
+    /**
+     * @param string $response
+     * @throws StreamError
+     */
     public static function hasUnrecoverableErrors(string $response)
     {
         preg_match_all("#<stream:error>(<(.*?) (.*?)\/>)<\/stream:error>#", $response, $streamErrors);

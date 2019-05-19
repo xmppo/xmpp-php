@@ -12,14 +12,6 @@ class Iq extends Stanza
         $this->socket->send($xml);
     }
 
-    /**
-     * Add JID to roster and give him your hand picked name. Adding to group is optional
-     *
-     * @param string $name
-     * @param string $forJid
-     * @param string $from
-     * @param string|null $groupName
-     */
     public function addToRoster(string $name, string $forJid, string $from, string $groupName = null)
     {
         $group = $groupName ? "<group>{$groupName}</group>" : null;

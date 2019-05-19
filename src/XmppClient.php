@@ -3,6 +3,7 @@
 namespace Norgul\Xmpp;
 
 use Norgul\Xmpp\Buffers\Response;
+use Norgul\Xmpp\Exceptions\DeadSocket;
 use Norgul\Xmpp\Exceptions\StreamError;
 use Norgul\Xmpp\Xml\Stanzas\Auth;
 use Norgul\Xmpp\Xml\Stanzas\Iq;
@@ -28,21 +29,14 @@ class XmppClient
         $this->options = $options;
         $this->responseBuffer = new Response();
 
-        try {
-            $this->socket = new Socket($options, $this->responseBuffer);
-        } catch (Exceptions\DeadSocket $e) {
-            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
-            return;
-        }
+        $this->socket = $this->initSocket();
 
         $this->auth = new Auth($this->socket);
         $this->iq = new Iq($this->socket);
         $this->presence = new Presence($this->socket);
         $this->message = new Message($this->socket);
 
-        if ($this->options->getSessionManager() !== false) {
-            $this->initSession($sessionId);
-        }
+        $this->initSession($sessionId);
     }
 
     public function connect()
@@ -105,6 +99,10 @@ class XmppClient
 
     protected function initSession($sessionId)
     {
+        if (!$this->options->getSessionManager()) {
+            return;
+        }
+
         session_id($sessionId ?: uniqid());
         session_start();
     }
@@ -116,9 +114,27 @@ class XmppClient
         } catch (StreamError $e) {
             $this->options->getLogger()->logResponse(__METHOD__ . '::' . __LINE__ . " $response");
             $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
-            $this->connect();
+            $this->reconnect();
             $response = '';
         }
         return $response;
+    }
+
+    protected function reconnect()
+    {
+        $this->socket = $this->initSocket();
+
+        $this->responseBuffer->flush();
+        $this->connect();
+    }
+
+    protected function initSocket(): Socket
+    {
+        try {
+            return new Socket($this->options, $this->responseBuffer);
+        } catch (DeadSocket $e) {
+            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
+            return null;
+        }
     }
 }

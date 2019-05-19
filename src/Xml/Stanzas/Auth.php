@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp\Xml\Stanzas;
 
+use Norgul\Xmpp\AuthTypes\Authenticable;
+
 class Auth extends Stanza
 {
     public function authenticate()
@@ -14,12 +16,7 @@ class Auth extends Stanza
             $this->socket->send(self::openXmlStream($options->getHost()));
         }
 
-        $mechanism = $options->getAuthType()->getName();
-        $encodedCredentials = $options->getAuthType()->encodedCredentials();
-        $nameSpace = "urn:ietf:params:xml:ns:xmpp-sasl";
-
-        $xml = "<auth xmlns='{$nameSpace}' mechanism='{$mechanism}'>{$encodedCredentials}</auth>";
-
+        $xml = $this->generateAuthXml($options->getAuthType());
         $this->socket->send($xml);
     }
 
@@ -34,5 +31,14 @@ class Auth extends Stanza
         }
 
         stream_socket_enable_crypto($this->socket->connection, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+    }
+
+    protected function generateAuthXml(Authenticable $authType): string
+    {
+        $mechanism = $authType->getName();
+        $encodedCredentials = $authType->encodedCredentials();
+        $nameSpace = "urn:ietf:params:xml:ns:xmpp-sasl";
+
+        return "<auth xmlns='{$nameSpace}' mechanism='{$mechanism}'>{$encodedCredentials}</auth>";
     }
 }

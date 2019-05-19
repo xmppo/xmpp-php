@@ -22,7 +22,7 @@ class Response
         return $response;
     }
 
-    protected function flush()
+    public function flush()
     {
         $this->response = [];
     }

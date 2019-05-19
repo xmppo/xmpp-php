@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp\Loggers;
 
+use Exception;
+
 class Logger implements Loggable
 {
     public $log;
@@ -44,47 +46,6 @@ class Logger implements Loggable
         $this->writeToFile($this->log, $prefix . "$message\n");
     }
 
-    public function parseBySession($sessionId)
-    {
-        $logFile = fopen(self::LOG_FOLDER . '/' . self::LOG_FILE, 'r');
-        $responseFilePath = $this->getFilePathFromResource($logFile);
-        $log = fread($logFile, filesize($responseFilePath));
-
-        preg_match_all("#\d{4}\.\d{2}.\d{2} \d{2}:\d{2}:\d{2} (.*?) (REQUEST|RESPONSE).*?(<.*>)#", $log, $matches);
-
-        echo print_r($matches, true);
-
-        if (count($matches) < 2 || !is_array($matches[1]) || empty($matches[1])) {
-            return;
-        }
-
-//        $response = fopen(self::LOG_FOLDER . '/' . $sessionId . '_response.log', 'w');
-    }
-
-    protected function matchXml(string $interpolated, $file, $type)
-    {
-        preg_match_all("#($type)::.*?::\d+(.*)#", $interpolated, $match);
-
-        if (count($match) < 1 || !is_array($match[1]) || empty($match[1])) {
-            return false;
-        }
-
-        $this->writeToFile($file, $match[1][0]);
-
-        return true;
-    }
-
-    protected function clean($log)
-    {
-        preg_match_all("#.*?::.*?::\d+(.*)#", $log, $match);
-
-        if (count($match) < 1 || !is_array($match[1]) || empty($match[1])) {
-            return '';
-        }
-
-        return $match[1][0];
-    }
-
     public function getFilePathFromResource($resource)
     {
         $metaData = stream_get_meta_data($resource);
@@ -95,7 +56,7 @@ class Logger implements Loggable
     {
         try {
             fwrite($file, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // silent fail
         }
     }

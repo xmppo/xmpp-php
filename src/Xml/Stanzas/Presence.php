@@ -29,8 +29,7 @@ class Presence extends Stanza
 
     protected function setPresence(string $to, string $type = "subscribe")
     {
-        $xml = "<presence from='{$this->options->bareJid()}' to='{$to}' type='{$type}'/>";
-
+        $xml = "<presence from='{$this->socket->getOptions()->bareJid()}' to='{$to}' type='{$type}'/>";
         $this->socket->send($xml);
     }
 
@@ -42,10 +41,10 @@ class Presence extends Stanza
      */
     public function setPriority(int $value, string $forResource = null)
     {
-        $from = self::quote($this->options->fullJid());
+        $from = self::quote($this->socket->getOptions()->fullJid());
 
         if ($forResource) {
-            $from = $this->options->getUsername() . "/$forResource";
+            $from = $this->socket->getOptions()->getUsername() . "/$forResource";
         }
 
         $priority = "<priority>{$this->limitPriority($value)}</priority>";
