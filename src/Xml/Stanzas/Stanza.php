@@ -2,7 +2,6 @@
 
 namespace Norgul\Xmpp\Xml\Stanzas;
 
-use Norgul\Xmpp\Options;
 use Norgul\Xmpp\Socket;
 use Norgul\Xmpp\Xml\Xml;
 
@@ -11,12 +10,10 @@ abstract class Stanza
     use Xml;
 
     protected $socket;
-    protected $options;
 
-    public function __construct(Socket $socket, Options $options)
+    public function __construct(Socket $socket)
     {
         $this->socket = $socket;
-        $this->options = $options;
     }
 
     protected function uniqueId(): string
@@ -26,7 +23,7 @@ abstract class Stanza
 
     protected function readResponseFile()
     {
-        $logger = $this->options->getLogger();
+        $logger = $this->socket->getOptions()->getLogger();
         $responseFilePath = $logger->getFilePathFromResource($logger->log);
         $responseFile = fopen($responseFilePath, 'r');
 

@@ -20,9 +20,28 @@ class Logger implements Loggable
 
     public function log($message)
     {
-        $prefix = date("Y.m.d H:m:s") . " " . session_id();
-        $this->safeWrite($this->log, $prefix . " $message\n");
-//        $this->parseBySession(session_id());
+        $this->writeToLog($message);
+    }
+
+    public function logRequest($message)
+    {
+        $this->writeToLog($message, "REQUEST");
+    }
+
+    public function logResponse($message)
+    {
+        $this->writeToLog($message, "RESPONSE");
+    }
+
+    public function error($message)
+    {
+        $this->writeToLog($message, "ERROR");
+    }
+
+    protected function writeToLog($message, $type = ''): void
+    {
+        $prefix = date("Y.m.d H:m:s") . " " . session_id() . ($type ? " {$type}::" : " ");
+        $this->writeToFile($this->log, $prefix . "$message\n");
     }
 
     public function parseBySession($sessionId)
@@ -50,7 +69,7 @@ class Logger implements Loggable
             return false;
         }
 
-        $this->safeWrite($file, $match[1][0]);
+        $this->writeToFile($file, $match[1][0]);
 
         return true;
     }
@@ -72,7 +91,7 @@ class Logger implements Loggable
         return $metaData["uri"];
     }
 
-    protected function safeWrite($file, $message)
+    protected function writeToFile($file, $message)
     {
         try {
             fwrite($file, $message);

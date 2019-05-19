@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp\Xml;
 
+use Norgul\Xmpp\Exceptions\StreamError;
+
 trait Xml
 {
     /**
@@ -115,5 +117,14 @@ trait Xml
         }
 
         return $match[1];
+    }
+
+    public static function hasUnrecoverableErrors(string $response)
+    {
+        preg_match_all("#<stream:error>(<(.*?) (.*?)\/>)<\/stream:error>#", $response, $streamErrors);
+
+        if ((!empty($streamErrors[0])) && count($streamErrors[2]) > 0) {
+            throw new StreamError($streamErrors[2][0]);
+        }
     }
 }

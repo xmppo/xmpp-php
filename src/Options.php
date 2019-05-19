@@ -7,7 +7,6 @@ use Norgul\Xmpp\AuthTypes\Plain;
 use Norgul\Xmpp\Loggers\Loggable;
 use Norgul\Xmpp\Loggers\Logger;
 use Psr\Log\InvalidArgumentException;
-use Psr\Log\LoggerInterface;
 
 class Options
 {
@@ -36,8 +35,8 @@ class Options
      */
     protected $resource;
     /**
-     * PSR-3 logger interface
-     * @var $logger LoggerInterface
+     * Custom logger interface
+     * @var $logger Loggable
      */
     protected $logger;
     /**
@@ -59,7 +58,7 @@ class Options
     public function getHost()
     {
         if (!$this->host) {
-            $this->logger->error("No host found, please set the host variable");
+            $this->logger->error(__METHOD__ . '::' . __LINE__ . "No host found, please set the host variable");
             throw new InvalidArgumentException();
         }
 
@@ -86,7 +85,7 @@ class Options
     public function getUsername()
     {
         if (!$this->username) {
-            $this->logger->error("No username found, please set the username variable");
+            $this->logger->error(__METHOD__ . '::' . __LINE__ . "No username found, please set the username variable");
             throw new InvalidArgumentException();
         }
 
@@ -116,7 +115,7 @@ class Options
     public function getPassword()
     {
         if (!$this->password) {
-            $this->logger->error("No password found, please set the password variable");
+            $this->logger->error(__METHOD__ . '::' . __LINE__ . "No password found, please set the password variable");
             throw new InvalidArgumentException();
         }
 

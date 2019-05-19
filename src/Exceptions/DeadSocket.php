@@ -3,7 +3,9 @@
 
 namespace Norgul\Xmpp\Exceptions;
 
-class DeadSocket extends \Exception
+use Exception;
+
+class DeadSocket extends Exception
 {
     public function __construct()
     {

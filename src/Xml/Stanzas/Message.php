@@ -17,6 +17,6 @@ class Message extends Stanza
 
     public function receive()
     {
-        return self::parseTag($this->socket->receive(), "message");
+        return self::parseTag($this->socket->getResponseBuffer()->read(), "message");
     }
 }

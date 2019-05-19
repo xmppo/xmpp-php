@@ -2,6 +2,8 @@
 
 namespace Norgul\Xmpp;
 
+use Norgul\Xmpp\Buffers\Response;
+use Norgul\Xmpp\Exceptions\StreamError;
 use Norgul\Xmpp\Xml\Stanzas\Auth;
 use Norgul\Xmpp\Xml\Stanzas\Iq;
 use Norgul\Xmpp\Xml\Stanzas\Message;
@@ -14,6 +16,7 @@ class XmppClient
 
     protected $socket;
     protected $options;
+    protected $responseBuffer;
 
     public $auth;
     public $iq;
@@ -23,18 +26,19 @@ class XmppClient
     public function __construct(Options $options, $sessionId = null)
     {
         $this->options = $options;
+        $this->responseBuffer = new Response();
 
         try {
-            $this->socket = new Socket($options);
+            $this->socket = new Socket($options, $this->responseBuffer);
         } catch (Exceptions\DeadSocket $e) {
-            echo $e->getMessage();
+            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
             return;
         }
 
-        $this->auth = new Auth($this->socket, $options);
-        $this->iq = new Iq($this->socket, $options);
-        $this->presence = new Presence($this->socket, $options);
-        $this->message = new Message($this->socket, $options);
+        $this->auth = new Auth($this->socket);
+        $this->iq = new Iq($this->socket);
+        $this->presence = new Presence($this->socket);
+        $this->message = new Message($this->socket);
 
         if ($this->options->getSessionManager() !== false) {
             $this->initSession($sessionId);
@@ -56,7 +60,11 @@ class XmppClient
 
     public function getResponse(): string
     {
-        return $this->socket->receive();
+        $this->socket->receive();
+        $response = $this->responseBuffer->read();
+        $finalResponse = $this->checkForErrors($response);
+
+        return $finalResponse;
     }
 
     /**
@@ -80,7 +88,7 @@ class XmppClient
 
     public function disconnect()
     {
-        $this->socket->autoAnswerSend(self::closeXmlStream());
+        $this->socket->send(self::closeXmlStream());
         $this->socket->disconnect();
     }
 
@@ -99,5 +107,18 @@ class XmppClient
     {
         session_id($sessionId ?: uniqid());
         session_start();
+    }
+
+    protected function checkForErrors(string $response): string
+    {
+        try {
+            self::hasUnrecoverableErrors($response);
+        } catch (StreamError $e) {
+            $this->options->getLogger()->logResponse(__METHOD__ . '::' . __LINE__ . " $response");
+            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
+            $this->connect();
+            $response = '';
+        }
+        return $response;
     }
 }
