@@ -44,9 +44,8 @@ class XmppClient
         $this->options = $options;
         $this->responseBuffer = new Response();
 
-        $this->initSocket();
+        $this->socket = $this->initSocket();
         $this->initStanzas($this->socket);
-
         $this->initSession($sessionId);
     }
 
@@ -135,15 +134,15 @@ class XmppClient
     {
         $this->responseBuffer->flush();
         $this->disconnect();
-        $this->initSocket();
+        $this->socket = $this->initSocket();
         $this->initStanzas($this->socket);
         $this->connect();
     }
 
-    protected function initSocket()
+    protected function initSocket(): Socket
     {
         try {
-            $this->socket = new Socket($this->options, $this->responseBuffer);
+            return new Socket($this->options, $this->responseBuffer);
         } catch (DeadSocket $e) {
             $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
             return null;
