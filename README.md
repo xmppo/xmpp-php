@@ -3,6 +3,7 @@
 [![Latest Stable Version](https://poser.pugx.org/norgul/xmpp-php/v/stable)](https://packagist.org/packages/norgul/xmpp-php)
 [![Total Downloads](https://poser.pugx.org/norgul/xmpp-php/downloads)](https://packagist.org/packages/norgul/xmpp-php)
 [![Latest Unstable Version](https://poser.pugx.org/norgul/xmpp-php/v/unstable)](https://packagist.org/packages/norgul/xmpp-php)
+[![Build Status](https://travis-ci.org/Norgul/xmpp-php.svg?branch=master)](https://travis-ci.org/Norgul/xmpp-php)
 [![License](https://poser.pugx.org/norgul/xmpp-php/license)](https://packagist.org/packages/norgul/xmpp-php)
 
 This is low level socket implementation for enabling PHP to 
