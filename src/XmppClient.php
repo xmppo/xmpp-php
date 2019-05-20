@@ -39,14 +39,14 @@ class XmppClient
      */
     public $message;
 
-    public function __construct(Options $options, $sessionId = null)
+    public function __construct(Options $options)
     {
         $this->options = $options;
         $this->responseBuffer = new Response();
 
         $this->socket = $this->initSocket();
         $this->initStanzas($this->socket);
-        $this->initSession($sessionId);
+        $this->initSession();
     }
 
     public function connect()
@@ -107,14 +107,12 @@ class XmppClient
         $this->socket->send('<presence/>');
     }
 
-    protected function initSession($sessionId)
+    protected function initSession()
     {
-        if (!$this->options->getSessionManager()) {
-            return;
+        if (session_status() === PHP_SESSION_NONE) {
+            session_id(uniqid());
+            session_start();
         }
-
-        session_id($sessionId ?: uniqid());
-        session_start();
     }
 
     protected function checkForErrors(string $response): string

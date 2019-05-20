@@ -49,12 +49,6 @@ class Options
      */
     protected $authType;
 
-    /**
-     * Init default session
-     * @var bool
-     */
-    protected $sessionManager = true;
-
     public function getHost()
     {
         if (!$this->host) {
@@ -219,17 +213,6 @@ class Options
     public function setAuthType(Authenticable $authType)
     {
         $this->authType = $authType;
-        return $this;
-    }
-
-    public function getSessionManager(): bool
-    {
-        return $this->sessionManager;
-    }
-
-    public function setSessionManager(bool $sessionManager)
-    {
-        $this->sessionManager = $sessionManager;
         return $this;
     }
 }
