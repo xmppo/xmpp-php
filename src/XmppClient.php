@@ -43,7 +43,6 @@ class XmppClient
     {
         $this->options = $options;
         $this->responseBuffer = new Response();
-
         $this->socket = $this->initSocket();
         $this->initStanzas($this->socket);
         $this->initSession();
@@ -106,11 +105,29 @@ class XmppClient
         $this->socket->send('<presence/>');
     }
 
+    protected function initStanzas($socket)
+    {
+        $this->auth = new Auth($socket);
+        $this->iq = new Iq($socket);
+        $this->presence = new Presence($socket);
+        $this->message = new Message($socket);
+    }
+
     protected function initSession()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_id(uniqid());
             session_start();
+        }
+    }
+
+    protected function initSocket(): Socket
+    {
+        try {
+            return new Socket($this->options, $this->responseBuffer);
+        } catch (DeadSocket $e) {
+            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
+            return null;
         }
     }
 
@@ -134,23 +151,5 @@ class XmppClient
         $this->socket = $this->initSocket();
         $this->initStanzas($this->socket);
         $this->connect();
-    }
-
-    protected function initSocket(): Socket
-    {
-        try {
-            return new Socket($this->options, $this->responseBuffer);
-        } catch (DeadSocket $e) {
-            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
-            return null;
-        }
-    }
-
-    protected function initStanzas($socket)
-    {
-        $this->auth = new Auth($socket);
-        $this->iq = new Iq($socket);
-        $this->presence = new Presence($socket);
-        $this->message = new Message($socket);
     }
 }
