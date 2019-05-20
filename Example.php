@@ -9,7 +9,7 @@ class Example
     protected static $username = 'foo';
     protected static $password = 'bar';
 
-    public static function go()
+    public static function test()
     {
         $options = new Options();
 
@@ -77,4 +77,4 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require __DIR__ . '/vendor/autoload.php';
-Example::go();
+Example::test();

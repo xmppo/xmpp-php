@@ -10,6 +10,7 @@
     <exclude-pattern>*/tests/*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/.idea/*</exclude-pattern>
+    <exclude-pattern>*/Example*</exclude-pattern>
 
     <arg name="report" value="summary"/>
     <arg name="colors"/>
