@@ -77,17 +77,16 @@ class XmppClient
      */
     public function getMessages(): array
     {
+        $this->socket->receive();
         return $this->message->receive();
     }
 
     public function prettyPrint($response)
     {
-        if (!$response) {
-            return;
+        if ($response) {
+            $separator = "\n-------------\n";
+            echo "{$separator} $response {$separator}";
         }
-
-        $separator = "\n-------------\n";
-        echo "{$separator} $response {$separator}";
     }
 
     public function disconnect()
@@ -118,7 +117,7 @@ class XmppClient
     protected function checkForErrors(string $response): string
     {
         try {
-            self::hasUnrecoverableErrors($response);
+            self::checkForUnrecoverableErrors($response);
         } catch (StreamError $e) {
             $this->options->getLogger()->logResponse(__METHOD__ . '::' . __LINE__ . " $response");
             $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());

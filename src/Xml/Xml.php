@@ -7,9 +7,7 @@ use Norgul\Xmpp\Exceptions\StreamError;
 trait Xml
 {
     /**
-     * Opening tag for starting a XMPP stream exchange. One session equals to
-     * one XML document so this constant is purposely not properly closed as
-     * all communication happens in between open-close tags
+     * Opening tag for starting a XMPP stream exchange.
      * @param $host
      * @return string
      */
@@ -39,9 +37,9 @@ trait Xml
 
     public static function parseTag($rawResponse, string $tag): array
     {
-        $matchByTag = preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched);
+        preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched);
 
-        if (!$matchByTag || count($matched) <= 1) {
+        if (count($matched) <= 1) {
             return [];
         }
 
@@ -118,7 +116,7 @@ trait Xml
      * @param string $response
      * @throws StreamError
      */
-    public static function hasUnrecoverableErrors(string $response)
+    public static function checkForUnrecoverableErrors(string $response)
     {
         preg_match_all("#<stream:error>(<(.*?) (.*?)\/>)<\/stream:error>#", $response, $streamErrors);
 
