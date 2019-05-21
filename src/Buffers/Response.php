@@ -2,7 +2,7 @@
 
 namespace Norgul\Xmpp\Buffers;
 
-class Response
+class Response implements Buffer
 {
     protected $response;
 

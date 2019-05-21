@@ -272,3 +272,5 @@ second request. With this in mind my only idea was to implement throttling with 
 fetching a message may delete one server response. If you get in one batch both roster and message, it will be added to the buffer.
 Calling back the response will get either roster or message, not both. And then buffer will be flushed. This is something that
 needs thinking. 
+- **structure of XmppClient** - in order to enable the `$client->stanza->method` I need to instantiate all stanzas within the 
+class. I feel as this could be simplified.
