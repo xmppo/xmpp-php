@@ -211,3 +211,64 @@ that and you are sure it is a XMPP valid XML, you can remove the parsing line an
  **Be aware! Be very aware!** sending an invalid XML to the server
 will probably invalidate currently open XML session and you will probably need to restart the 
 script.
+
+# Dev documentation
+For anyone willing to contribute, a quick breakdown of the structure:
+
+---
+- `Options.php` - everything that is variable about the library
+- `Socket.php` - socket related implementation (connecting, reading, writing etc.)
+- `XmppClient.php` - user friendly methods to interact with the library and stanza wrapper enabling users to call stanza methods through
+instantiated class. This should contain as little logic as possible, turns out it's not so easy :)
+---
+- `AuthTypes` - contains methods to authenticate yourself to XMPP server. Besides concrete implementations there is also an 
+abstract class with minor logic to avoid duplication and interface having all the necessary methods should the need for new
+auth type arise. 
+
+- `Buffers` - implementation of buffer (or should I say a simple array) which gets filled when socket is calling the `receive()`
+method, and it flushes on any read, which happens when calling `getResponse()` method for example. A brief history of why: I had 
+issues when a non-recoverable error would be thrown. In this situation I had to do 2 things: try to reconnect, show the error 
+to the user. The thing is that `getResponse()` returns string, and in case of reconnection the program execution would continue
+returning either nothing or returning error string after the server already connected for the second time, thus misinforming the 
+user of the error which occurred before reconnection. Buffer was born. 
+
+- `Exceptions` - this is more or less a standard. I am just overriding constructors so I can get my message in.
+
+- `Loggers` - containing logic to store logs to the `logs/xmpp.log` file. The idea was to keep several log types inside (full, simple,
+no logger), but I found the one made to be sufficient. 
+
+---
+
+`Xml` 
+
+- `Xml.php` - a trait consisting of way too many regex matching. This should be reformatted. 
+- `Stanzas` - main logic for all stanza communication with the server. This used to be just plain XML, but I have decided to
+forward a socket dependency inside so that when you call the method, you actually also send it to the server. That used to be 
+something like `$this->socket->send($this->iq->getRoster())` which is correct from the programming perspective, but for the
+simplicity sake, I like the `$client->iq->getRoster()` more. I'm open to other suggestions. 
+
+---
+
+## CI
+Continuous integration is done through [Travis CI](https://travis-ci.org/), and each push goes through a process which is currently
+as simple as:
+- check unit tests (and god knows I have them)
+- check for syntax errors
+- run `phpcs` (configuration in `phpcs.xml`)
+- run `phpmd` (configuration in `phpmd.xml`)
+
+## TODO's
+
+- **unit testing** - unfortunately I have been prolonging this for far too long, maybe there is a good soul out there who enjoys 
+writing tests.
+- **throttling** - when an unrecoverable error occurs (currently I am catching `<stream:error>` ones which break the stream)
+reconnect is being made automatically. In case this is happening over and over again, program will try connecting indefinitely, 
+which is fine to any aspect except logs which will get clogged. I would like to throttle the connection so that it increases the
+connection time each time it is unsuccessful. Problem here is that I can only catch the error when getting the response, and
+response can be successful on the first XML exchange (for example when you send opening stream request), while breaking on the 
+second request. With this in mind my only idea was to implement throttling with timestamps or something. 
+- **sessions** - I presume this part is working correctly but should be tested from a framework
+- **multiple connections** - I think this part works fine, but I am worried that triggering `getRoster()` while simultaneously
+fetching a message may delete one server response. If you get in one batch both roster and message, it will be added to the buffer.
+Calling back the response will get either roster or message, not both. And then buffer will be flushed. This is something that
+needs thinking. 
