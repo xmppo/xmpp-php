@@ -12,8 +12,6 @@ class DeadSocket extends Exception
         $errorCode = socket_last_error();
         $errorMsg = socket_strerror($errorCode);
 
-        $message = "Couldn't create socket: [$errorCode] $errorMsg";
-
-        parent::__construct($message);
+        parent::__construct("Couldn't create socket: [$errorCode] $errorMsg");
     }
 }

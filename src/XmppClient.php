@@ -20,7 +20,6 @@ class XmppClient
      */
     protected $socket;
     protected $options;
-    protected $responseBuffer;
 
     /**
      * @var $auth Auth
@@ -42,10 +41,14 @@ class XmppClient
     public function __construct(Options $options)
     {
         $this->options = $options;
-        $this->responseBuffer = new Response();
+        $this->initDependencies();
+        $this->initSession();
+    }
+
+    protected function initDependencies(): void
+    {
         $this->socket = $this->initSocket();
         $this->initStanzas($this->socket);
-        $this->initSession();
     }
 
     public function connect()
@@ -64,20 +67,10 @@ class XmppClient
     public function getResponse(): string
     {
         $this->socket->receive();
-        $response = $this->responseBuffer->read();
+        $response = $this->socket->getResponseBuffer()->read();
         $finalResponse = $this->checkForErrors($response);
 
         return $finalResponse;
-    }
-
-    /**
-     * Extracting messages from the response
-     * @return array
-     */
-    public function getMessages(): array
-    {
-        $this->socket->receive();
-        return $this->message->receive();
     }
 
     public function prettyPrint($response)
@@ -124,7 +117,7 @@ class XmppClient
     protected function initSocket(): Socket
     {
         try {
-            return new Socket($this->options, $this->responseBuffer);
+            return new Socket($this->options);
         } catch (DeadSocket $e) {
             $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
             return null;
@@ -146,10 +139,8 @@ class XmppClient
 
     protected function reconnect()
     {
-        $this->responseBuffer->flush();
         $this->disconnect();
-        $this->socket = $this->initSocket();
-        $this->initStanzas($this->socket);
+        $this->initDependencies();
         $this->connect();
     }
 }

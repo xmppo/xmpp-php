@@ -13,11 +13,15 @@ class Logger implements Loggable
 
     public function __construct()
     {
+        $this->createLogFile();
+        $this->log = fopen(self::LOG_FOLDER . '/' . self::LOG_FILE, 'a');
+    }
+
+    protected function createLogFile(): void
+    {
         if (!file_exists(self::LOG_FOLDER)) {
             mkdir(self::LOG_FOLDER, 0777, true);
         }
-
-        $this->log = fopen(self::LOG_FOLDER . '/' . self::LOG_FILE, 'a');
     }
 
     public function log($message)
@@ -46,12 +50,6 @@ class Logger implements Loggable
         $this->writeToFile($this->log, $prefix . "$message\n");
     }
 
-    public function getFilePathFromResource($resource)
-    {
-        $metaData = stream_get_meta_data($resource);
-        return $metaData["uri"];
-    }
-
     protected function writeToFile($file, $message)
     {
         try {
@@ -59,5 +57,11 @@ class Logger implements Loggable
         } catch (Exception $e) {
             // silent fail
         }
+    }
+
+    public function getFilePathFromResource($resource): string
+    {
+        $metaData = stream_get_meta_data($resource);
+        return $metaData["uri"];
     }
 }

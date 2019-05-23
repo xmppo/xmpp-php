@@ -104,12 +104,13 @@ If you would like to see the output of the received response in the console you 
 ## Receiving messages and other responses
 
 In case you are not interested in complete response which comes from server, you may also use 
-`$client->getMessages()` which will match message tags with regex and return array of matched 
-messages. In case you'd like to see the response in the terminal, you can do something like this:
+`$client->message->receive()` (`$client->getMessages()` was removed because it was just a shorthand
+method for this one) which will match message tags with regex and return array of matched messages. 
+In case you'd like to see the response in the terminal, you can do something like this:
 
 ```
 do {
-    $response = $client->getMessages();
+    $response = $client->message->receive();
     if($response)
         echo print_r($response);
 } while (true);

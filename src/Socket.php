@@ -3,7 +3,6 @@
 namespace Norgul\Xmpp;
 
 use Exception;
-use Norgul\Xmpp\Buffers\Buffer;
 use Norgul\Xmpp\Buffers\Response;
 use Norgul\Xmpp\Exceptions\DeadSocket;
 
@@ -22,12 +21,11 @@ class Socket
     /**
      * Socket constructor.
      * @param Options $options
-     * @param Response $responseBuffer
      * @throws DeadSocket
      */
-    public function __construct(Options $options, Buffer $responseBuffer)
+    public function __construct(Options $options)
     {
-        $this->responseBuffer = $responseBuffer;
+        $this->responseBuffer = new Response();
         $this->connection = stream_socket_client($options->fullSocketAddress());
 
         if (!$this->isAlive($this->connection)) {

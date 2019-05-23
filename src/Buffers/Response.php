@@ -8,21 +8,19 @@ class Response implements Buffer
 
     public function write($data)
     {
-        if (!$data) {
-            return;
+        if ($data) {
+            $this->response[] = $data;
         }
-
-        $this->response[] = $data;
     }
 
     public function read()
     {
-        $response = implode('', $this->response);
+        $implodedResponse = implode('', $this->response);
         $this->flush();
-        return $response;
+        return $implodedResponse;
     }
 
-    public function flush()
+    protected function flush()
     {
         $this->response = [];
     }
