@@ -43,13 +43,9 @@ trait Xml
             return [];
         }
 
-        $response = [];
-
-        foreach ($matched[1] as $match) {
-            $response[] = @simplexml_load_string($match);
-        }
-
-        return $response;
+        return array_map(function ($match) {
+            return @simplexml_load_string($match);
+        }, $matched[1]);
     }
 
     public static function parseFeatures($xml)
@@ -74,7 +70,6 @@ trait Xml
         return count($match) > 0;
     }
 
-
     public static function matchCompleteTag($xml, $tag)
     {
         $match = self::matchTag($xml, $tag);
@@ -90,12 +85,7 @@ trait Xml
     private static function matchTag($xml, $tag)
     {
         preg_match("#<$tag.*?>(.*)<\/$tag>#", $xml, $match);
-
-        if (count($match) < 1) {
-            return "";
-        }
-
-        return $match;
+        return count($match) < 1 ? '' : $match;
     }
 
     public static function canProceed($xml)
@@ -107,23 +97,13 @@ trait Xml
     public static function supportedAuthMethods($xml)
     {
         preg_match_all("#<mechanism>(.*?)<\/mechanism>#", $xml, $match);
-
-        if (count($match) < 1) {
-            return [];
-        }
-
-        return $match[1];
+        return count($match) < 1 ? [] : $match[1];
     }
 
     public static function roster($xml)
     {
         preg_match_all("#<iq.*?type=[\'|\"]result[\'|\"]>(.*?)<\/iq>#", $xml, $match);
-
-        if (count($match) < 1) {
-            return [];
-        }
-
-        return $match[1];
+        return count($match) < 1 ? [] : $match[1];
     }
 
     /**
