@@ -2,7 +2,6 @@
 
 namespace Norgul\Xmpp;
 
-use Norgul\Xmpp\Buffers\Response;
 use Norgul\Xmpp\Exceptions\DeadSocket;
 use Norgul\Xmpp\Exceptions\StreamError;
 use Norgul\Xmpp\Xml\Stanzas\Auth;

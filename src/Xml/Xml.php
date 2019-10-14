@@ -39,11 +39,7 @@ trait Xml
     {
         preg_match_all("#(<$tag.*?>.*?<\/$tag>)#si", $rawResponse, $matched);
 
-        if (count($matched) <= 1) {
-            return [];
-        }
-
-        return array_map(function ($match) {
+        return count($matched) <= 1 ? [] : array_map(function ($match) {
             return @simplexml_load_string($match);
         }, $matched[1]);
     }

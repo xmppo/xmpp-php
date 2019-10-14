@@ -16,7 +16,7 @@ class Socket
     /**
      * Period in microseconds for imposed timeout while doing socket_read()
      */
-    protected $timeout = 200000;
+    protected $timeout = 150000;
 
     /**
      * Socket constructor.
