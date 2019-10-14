@@ -14,7 +14,7 @@ class Socket
     protected $options;
 
     /**
-     * Period in microseconds during which the socket will be active when doing a socket_read()
+     * Period in microseconds for imposed timeout while doing socket_read()
      */
     protected $timeout = 200000;
 
