@@ -52,25 +52,15 @@ trait Xml
         return $response;
     }
 
-    public static function matchTag($xml, $tag)
-    {
-        preg_match("#<$tag.*?>(.*)<\/$tag>#", $xml, $match);
-
-        if (count($match) < 1) {
-            return "";
-        }
-
-        return $match[1];
-    }
-
     public static function parseFeatures($xml)
     {
-        return self::matchTag($xml, "stream:features");
+        return self::matchInsideOfTag($xml, "stream:features");
     }
 
     public static function isTlsSupported($xml)
     {
-        return !empty(self::matchTag($xml, "starttls"));
+        $matchTag = self::matchCompleteTag($xml, "starttls");
+        return !empty($matchTag);
     }
 
     public static function isTlsRequired($xml)
@@ -79,14 +69,38 @@ trait Xml
             return false;
         }
 
-        $tls = self::matchTag($xml, "starttls");
+        $tls = self::matchCompleteTag($xml, "starttls");
         preg_match("#required#", $tls, $match);
         return count($match) > 0;
     }
 
+
+    public static function matchCompleteTag($xml, $tag)
+    {
+        $match = self::matchTag($xml, $tag);
+        return is_array($match) && count($match) > 0 ? $match[0] : [];
+    }
+
+    public static function matchInsideOfTag($xml, $tag)
+    {
+        $match = self::matchTag($xml, $tag);
+        return is_array($match) && count($match) > 1 ? $match[1] : [];
+    }
+
+    private static function matchTag($xml, $tag)
+    {
+        preg_match("#<$tag.*?>(.*)<\/$tag>#", $xml, $match);
+
+        if (count($match) < 1) {
+            return "";
+        }
+
+        return $match;
+    }
+
     public static function canProceed($xml)
     {
-        preg_match("#<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>#", $xml, $match);
+        preg_match("#<proceed xmlns=[\'|\"]urn:ietf:params:xml:ns:xmpp-tls[\'|\"]\/>#", $xml, $match);
         return count($match) > 0;
     }
 
@@ -103,7 +117,7 @@ trait Xml
 
     public static function roster($xml)
     {
-        preg_match_all("#<iq.*?type='result'>(.*?)<\/iq>#", $xml, $match);
+        preg_match_all("#<iq.*?type=[\'|\"]result[\'|\"]>(.*?)<\/iq>#", $xml, $match);
 
         if (count($match) < 1) {
             return [];

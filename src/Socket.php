@@ -14,9 +14,9 @@ class Socket
     protected $options;
 
     /**
-     * Period in seconds during which the socket will be active when doing a socket_read()
+     * Period in microseconds during which the socket will be active when doing a socket_read()
      */
-    protected $timeout = 1;
+    protected $timeout = 200000;
 
     /**
      * Socket constructor.
@@ -32,7 +32,8 @@ class Socket
             throw new DeadSocket();
         }
 
-        stream_set_timeout($this->connection, $this->timeout);
+        //stream_set_blocking($this->connection, true);
+        stream_set_timeout($this->connection, 0, $this->timeout);
         $this->options = $options;
     }
 
@@ -50,6 +51,7 @@ class Socket
         try {
             fwrite($this->connection, $xml);
             $this->options->getLogger()->logRequest(__METHOD__ . '::' . __LINE__ . " $xml");
+            //$this->checkSocketStatus();
         } catch (Exception $e) {
             $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " fwrite() failed " . $e->getMessage());
             return;
@@ -91,5 +93,19 @@ class Socket
     public function getOptions(): Options
     {
         return $this->options;
+    }
+
+    protected function checkSocketStatus(): void
+    {
+        $status = socket_get_status($this->connection);
+
+        //echo print_r($status);
+
+        if ($status['eof']) {
+            $this->options->getLogger()->logResponse(
+                __METHOD__ . '::' . __LINE__ .
+                " ---Probably a broken pipe, restart connection\n"
+            );
+        }
     }
 }

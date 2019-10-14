@@ -85,7 +85,10 @@ TLS is supported by default. If server has support for TLS, library will
 automatically try to connect with TLS and make the connection secure. 
 
 If you'd like to explicitly disable this functionality, you can use `setUseTls(false)` 
-function on the `Options` instance so that TLS communication is disabled. 
+function on the `Options` instance so that TLS communication is disabled. Note
+that this will function in environments where TLS is supported but not required. 
+If TLS is required, program will connect to it independently of the option you 
+set. 
 
 ## Sending raw data
 `send()` message is exposed as being public in `XmppClient` class, and its intention

@@ -15,7 +15,7 @@ class Response implements Buffer
 
     public function read()
     {
-        $implodedResponse = implode('', $this->response);
+        $implodedResponse = $this->response ? implode('', $this->response) : '';
         $this->flush();
         return $implodedResponse;
     }

@@ -11,7 +11,10 @@ class Auth extends Stanza
         $response = $this->socket->getResponseBuffer()->read();
         $options = $this->socket->getOptions();
 
-        if (self::isTlsRequired($response) && $options->usingTls()) {
+        $tlsSupported = self::isTlsSupported($response);
+        $tlsRequired = self::isTlsRequired($response);
+
+        if ($tlsSupported && ($tlsRequired || (!$tlsRequired && $options->usingTls()))) {
             $this->startTls();
             $this->socket->send(self::openXmlStream($options->getHost()));
         }

@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<stream:stream to='openfire.mysender.ru' xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client'
+               version='1.0'>
+    <auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>AGFzc2VjbwBrZWZKR3VlZjc4</auth>
+    <?xml version='1.0' encoding='UTF-8'?>
+    <stream:stream to='openfire.mysender.ru' xmlns:stream='http://etherx.jabber.org/streams' xmlns='jabber:client'
+                   version='1.0'>
+        <iq type='set' id='5da444955cb9e'>
+            <bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'>
+                <resource>norgul_machine_1571046549</resource>
+            </bind>
+        </iq>
+        <presence/>
+        <message to='2109536712451401@fb.openfire.mysender.ru' type='chat'>
+            <body>Ured Rijeka</body>
+        </message>
+
+
+<?xml version='1.0' encoding='UTF-8'?>
+<stream:stream xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client" from="openfire.mysender.ru"
+           id="11sli2jmq6" xml:lang="en" version="1.0">
+<stream:features>
+    <starttls xmlns="urn:ietf:params:xml:ns:xmpp-tls"></starttls>
+    <mechanisms xmlns="urn:ietf:params:xml:ns:xmpp-sasl">
+        <mechanism>PLAIN</mechanism>
+        <mechanism>SCRAM-SHA-1</mechanism>
+        <mechanism>CRAM-MD5</mechanism>
+        <mechanism>DIGEST-MD5</mechanism>
+    </mechanisms>
+    <compression xmlns="http://jabber.org/features/compress">
+        <method>zlib</method>
+    </compression>
+    <ver xmlns="urn:xmpp:features:rosterver"/>
+    <auth xmlns="http://jabber.org/features/iq-auth"/>
+    <c xmlns="http://jabber.org/protocol/caps" hash="sha-1"
+       node="https://www.igniterealtime.org/projects/openfire/" ver="BSfJG+SzdmU+kKuKDY8LlsdSEvw="/>
+</stream:features>
+<success xmlns="urn:ietf:params:xml:ns:xmpp-sasl"/>
+<?xml version='1.0' encoding='UTF-8'?>
+<stream:stream xmlns:stream="http://etherx.jabber.org/streams" xmlns="jabber:client"
+               from="openfire.mysender.ru" id="11sli2jmq6" xml:lang="en" version="1.0">
+    <stream:features>
+        <compression xmlns="http://jabber.org/features/compress">
+            <method>zlib</method>
+        </compression>
+        <ver xmlns="urn:xmpp:features:rosterver"/>
+        <bind xmlns="urn:ietf:params:xml:ns:xmpp-bind"/>
+        <session xmlns="urn:ietf:params:xml:ns:xmpp-session">
+            <optional/>
+        </session>
+        <sm xmlns='urn:xmpp:sm:2'/>
+        <sm xmlns='urn:xmpp:sm:3'/>
+        <c xmlns="http://jabber.org/protocol/caps" hash="sha-1"
+           node="https://www.igniterealtime.org/projects/openfire/" ver="BSfJG+SzdmU+kKuKDY8LlsdSEvw="/>
+    </stream:features>
+    <iq type="result" id="5da444955cb9e" to="openfire.mysender.ru/11sli2jmq6">
+        <bind xmlns="urn:ietf:params:xml:ns:xmpp-bind">
+            <jid>asseco@openfire.mysender.ru/norgul_machine_1571046549</jid>
+        </bind>
+    </iq>
+    <presence from="asseco@openfire.mysender.ru/norgul_machine_1571046549"
+              to="asseco@openfire.mysender.ru/norgul_machine_1571046549"/>
+
+
+
+
+
+
