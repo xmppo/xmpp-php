@@ -22,6 +22,11 @@ class Response implements Buffer
 
     protected function flush()
     {
-        $this->response = [];
+        $this->response = null;
+    }
+
+    public function getCurrentBufferData()
+    {
+        return $this->response;
     }
 }
