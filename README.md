@@ -177,13 +177,13 @@ and commented in the code directly in the `Options` class:
 ```
 $options
     ->setProtocol($protocol)  // defaults to TCP
-    ->setResource($resource)  // defaults to 'norgul_machine' string + timestamp
+    ->setResource($resource)  // defaults to 'norgul_machine_' string + timestamp
     ->setLogger($logger)      // logger instance (logging explained below)
     ->setAuthType($authType)  // Takes on classes which implement Authenticable
 ```
 
 ## Socket options
-Most of the socket options are set by default so there is no need to temper
+Most of the socket options are set by default so there is no need to tamper
 with this class, however you can additionally change the timeout for the period 
 the socket will be alive when doing a `socket_read()`, and you can do that with
 `$socket->setTimeout()`.
@@ -194,6 +194,9 @@ Upon new established session the library is creating a `xmpp.log` log file in `l
 
 You can manually set logger when instantiating `Options` with `setLogger($logger)`. The method accepts
 any object which implements `Loggable` interface so you can create your own implementation. 
+
+Fun fact: this used to be a `PSR-3` logger interface, but I decided it was an overkill for this 
+stage of development. 
   
 # Other
 
@@ -214,7 +217,12 @@ that and you are sure it is a XMPP valid XML, you can remove the parsing line an
  
  **Be aware! Be very aware!** sending an invalid XML to the server
 will probably invalidate currently open XML session and you will probably need to restart the 
-script.
+script. This is highly experimental and not maintained really. It is a poor orphan method whose
+parents have abandoned it and left in a hurry. It may prove to be Harry Potter one day, but hey...
+we all clearly doubt it. You may be a special snowflake but no one likes you. Onward to 
+orphanagemobil! Begone method (just kidding, I won't delete it)!
+
+Who says readme's are boring. 
 
 # Dev documentation
 For anyone willing to contribute, a quick breakdown of the structure:
