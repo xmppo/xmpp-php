@@ -32,6 +32,11 @@ class Example
         $error = 0;
 
         do {
+            sleep(1); // Make sure to back off at least 1 second to give the server some time to breath.
+            if($client->iq->ping() === false) // Check if the connection is still alive by sending a ping.
+            {
+                $error = 1; // If it fails set the error code to 1, this will break the loop and tell the program to exit with code 1.
+            }
             $response = $client->getResponse();
             $client->prettyPrint($response);
         } while ($error == 0);
@@ -42,7 +47,7 @@ class Example
         }
         else
         {
-            // Our connection, let's exit with an error and let the parent process decide what to do.
+            // Our connection is broken, let's exit with an error and let the parent process decide what to do.
             exit($error);
         }
     }
