@@ -29,12 +29,22 @@ class Example
         // Uncomment if you want to manually enter raw XML (or call a function) and see a server response
 //        (new self)->sendRawXML($client);
 
+        $error = 0;
+
         do {
             $response = $client->getResponse();
             $client->prettyPrint($response);
-        } while (true);
+        } while ($error == 0);
 
-        $client->disconnect();
+        if($error == 0)
+        {
+            $client->disconnect();
+        }
+        else
+        {
+            // Our connection, let's exit with an error and let the parent process decide what to do.
+            exit($error);
+        }
     }
 
     public function sendRawXML(XmppClient $client)
