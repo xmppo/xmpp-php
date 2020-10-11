@@ -27,6 +27,10 @@ class Options
      */
     protected $username;
     /**
+     * Authzid
+     */
+    protected $authzid;
+    /**
      * Realm to be used for the JID, instead of hostname
      */
     protected $realm;
@@ -124,6 +128,18 @@ class Options
         return $this;
     }
     
+    public function setAuthZID(string $authzid): Options
+    {
+        $this->authzid = trim($authzid);
+        
+        return $this;
+    }
+
+    public function getAuthZID()
+    {
+        return $this->authzid;
+    }
+
     public function setRealm(string $realm): Options
     {
         $this->realm = trim($realm);
