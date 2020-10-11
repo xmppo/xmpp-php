@@ -88,7 +88,7 @@ class XmppClient
 
     protected function openStream()
     {
-        $openStreamXml = self::openXmlStream($this->options->getHost());
+        $openStreamXml = self::openXmlStream((($this->options->getRealm()) ? $this->options->getRealm() : $this->options->getHost()));
         $this->socket->send($openStreamXml);
     }
 
