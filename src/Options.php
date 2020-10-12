@@ -27,6 +27,14 @@ class Options
      */
     protected $username;
     /**
+     * Authzid
+     */
+    protected $authzid;
+    /**
+     * Realm to be used for the JID, instead of hostname
+     */
+    protected $realm;
+    /**
      * Password to authenticate on XMPP server
      */
     protected $password;
@@ -43,6 +51,18 @@ class Options
      * Use TLS if available
      */
     protected $useTls = true;
+    /**
+     * SSL verify host
+     */
+    protected $ssl_verify_host = true;
+    /**
+     * SSL verify peer
+     */
+    protected $ssl_verify_peer = true;
+    /**
+     * SSL allow self signed certificates
+     */
+    protected $ssl_allow_self_signed = true;
     /**
      * Auth type (Authentication/AuthTypes/)
      * @var Authenticable $authType
@@ -107,6 +127,30 @@ class Options
 
         return $this;
     }
+    
+    public function setAuthZID(string $authzid): Options
+    {
+        $this->authzid = trim($authzid);
+        
+        return $this;
+    }
+
+    public function getAuthZID()
+    {
+        return $this->authzid;
+    }
+
+    public function setRealm(string $realm): Options
+    {
+        $this->realm = trim($realm);
+        
+        return $this;
+    }
+    
+    public function getRealm()
+    {
+        return $this->realm;
+    }
 
     public function getPassword()
     {
@@ -151,6 +195,39 @@ class Options
         return $this;
     }
 
+    public function getSSLVerifyHost()
+    {
+        return $this->ssl_verify_host;
+    }
+
+    public function setSSLVerifyHost(bool $val): Options
+    {
+        $this->ssl_verify_host = $val;
+        return $this;
+    }
+
+    public function getSSLVerifyPeer()
+    {
+        return $this->ssl_verify_peer;
+    }
+
+    public function setSSLVerifyPeer(bool $val): Options
+    {
+        $this->ssl_verify_peer = $val;
+        return $this;
+    }
+
+    public function getSSLAllowSelfSigned()
+    {
+        return $this->ssl_allow_self_signed;
+    }
+
+    public function setSSLAllowSelfSigned(bool $val): Options
+    {
+        $this->ssl_allow_self_signed = $val;
+        return $this;
+    }
+
     public function fullSocketAddress()
     {
         $protocol = $this->getProtocol();
@@ -164,17 +241,19 @@ class Options
     {
         $username = $this->getUsername();
         $resource = $this->getResource();
+        $realm = $this->getRealm();
         $host = $this->getHost();
 
-        return "$username@$host/$resource";
+        return "$username@".(($realm) ? $realm : $host)."/$resource";
     }
 
     public function bareJid()
     {
         $username = $this->getUsername();
+        $realm = $this->getRealm();
         $host = $this->getHost();
 
-        return "$username@$host";
+        return "$username@".(($realm) ? $realm : $host);
     }
 
     public function setLogger(Loggable $logger)

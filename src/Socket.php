@@ -26,7 +26,22 @@ class Socket
     public function __construct(Options $options)
     {
         $this->responseBuffer = new Response();
-        $this->connection = stream_socket_client($options->fullSocketAddress());
+
+        $errno = null;
+        $errstr = null;
+        $timeout = ini_get("default_socket_timeout");
+        $flags = STREAM_CLIENT_CONNECT;
+
+        $context = stream_context_create();
+
+        stream_context_set_option($context, 'ssl', 'verify_host', $options->getSSLVerifyHost());
+        stream_context_set_option($context, 'ssl', 'verify_peer', $options->getSSLVerifyPeer());
+        stream_context_set_option($context, 'ssl', 'allow_self_signed', $options->getSSLAllowSelfSigned());
+
+        $this->connection = stream_socket_client($options->fullSocketAddress(), $errno, $errstr, $timeout, $flags, $context);
+
+        if ($errno)
+            die("ERROR(".$errno."): ".$errstr."\n");
 
         if (!$this->isAlive($this->connection)) {
             throw new DeadSocket();

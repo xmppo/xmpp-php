@@ -16,12 +16,12 @@ class Auth extends Stanza
 
         if ($tlsSupported && ($tlsRequired || (!$tlsRequired && $options->usingTls()))) {
             $this->startTls();
-            $this->socket->send(self::openXmlStream($options->getHost()));
+            $this->socket->send(self::openXmlStream((($options->getRealm()) ? $options->getRealm() : $options->getHost())));
         }
 
         $xml = $this->generateAuthXml($options->getAuthType());
         $this->socket->send($xml);
-        $this->socket->send(self::openXmlStream($options->getHost()));
+        $this->socket->send(self::openXmlStream((($options->getRealm()) ? $options->getRealm() : $options->getHost())));
     }
 
     protected function startTls()
