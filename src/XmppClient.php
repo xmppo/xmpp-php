@@ -2,7 +2,6 @@
 
 namespace Norgul\Xmpp;
 
-use Norgul\Xmpp\Exceptions\DeadSocket;
 use Norgul\Xmpp\Exceptions\StreamError;
 use Norgul\Xmpp\Xml\Stanzas\Auth;
 use Norgul\Xmpp\Xml\Stanzas\Iq;
@@ -115,12 +114,7 @@ class XmppClient
 
     protected function initSocket(): Socket
     {
-        try {
-            return new Socket($this->options);
-        } catch (DeadSocket $e) {
-            $this->options->getLogger()->error(__METHOD__ . '::' . __LINE__ . " " . $e->getMessage());
-            return null;
-        }
+        return new Socket($this->options);
     }
 
     protected function checkForErrors(string $response): string
