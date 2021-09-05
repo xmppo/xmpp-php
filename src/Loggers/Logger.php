@@ -46,7 +46,7 @@ class Logger implements Loggable
 
     protected function writeToLog($message, $type = ''): void
     {
-        $prefix = date("Y.m.d H:m:s") . " " . session_id() . ($type ? " {$type}::" : " ");
+        $prefix = date("Y.m.d H:i:s") . " " . session_id() . ($type ? " {$type}::" : " ");
         $this->writeToFile($this->log, $prefix . "$message\n");
     }
 
